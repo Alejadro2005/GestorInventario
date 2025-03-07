@@ -8,7 +8,7 @@
 # Proyecto_codigo_limpio
 ---
 # Diagrama de clases
-![Diagrama de clases](img/Diagrama.drawio.png)
+![Diagrama drawio](https://github.com/user-attachments/assets/19b05e6d-76de-480b-904b-ddb99b561995)
 
 ---
 
