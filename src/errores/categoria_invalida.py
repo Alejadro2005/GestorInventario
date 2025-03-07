@@ -1,0 +1,2 @@
+class CategoriaInvalidaError(Exception):
+    pass

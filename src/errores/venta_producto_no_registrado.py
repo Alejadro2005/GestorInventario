@@ -1,0 +1,2 @@
+class VentaProductoNoRegistradoError(Exception):
+    pass

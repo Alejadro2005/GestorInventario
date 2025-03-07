@@ -1,0 +1,2 @@
+class PrecioInvalidoError(Exception):
+    pass
