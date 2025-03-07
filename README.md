@@ -1,4 +1,5 @@
 #algunos comandos que debes usar antes de hacer las pruebas
+    pip install -r requirements.txt
     python3 -m venv venv
     source venv/bin/activate
     export PYTHONPATH=$(pwd)
