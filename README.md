@@ -8,7 +8,7 @@
 # Proyecto_codigo_limpio
 ---
 # Diagrama de clases
-![Diagrama de Arquitectura](img/Diagrama.drawio.png)
+![Diagrama de clases](GestorInventario/Diagrama.drawio.png)
 
 ---
 
