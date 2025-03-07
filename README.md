@@ -7,16 +7,15 @@
 
 # Proyecto_codigo_limpio
 ---
-# Diagrama de clases
-![Diagrama drawio](https://github.com/user-attachments/assets/19b05e6d-76de-480b-904b-ddb99b561995)
-
----
-
 # 📦 Gestor de Inventario y Ventas  
 Sistema para gestionar productos, ventas y usuarios en un entorno retail. Permite:  
 - **Control de inventario**: Agregar, eliminar y actualizar productos.  
 - **Registro de ventas**: Validar stock y generar historial.  
-- **Gestión de usuarios**: Roles (Admin/Empleado) y autenticación segura.  
+- **Gestión de usuarios**: Roles (Admin/Empleado) y autenticación segura.
+
+---
+# Diagrama de clases
+![Diagrama drawio](https://github.com/user-attachments/assets/19b05e6d-76de-480b-904b-ddb99b561995) 
 
 ---
 # 📋 Tabla de Casos de Prueba (54 Total)
