@@ -16,7 +16,8 @@ Sistema para gestionar productos, ventas y usuarios en un entorno retail. Permit
 
 ---
 # Diagrama de clases
-![Diagrama drawio](https://github.com/user-attachments/assets/19b05e6d-76de-480b-904b-ddb99b561995) 
+
+![Diagrama](https://github.com/user-attachments/assets/02442fa2-5d86-40f2-b4dd-3cf747bbd67c)
 
 ---
 # 📋 Tabla de Casos de Prueba (54 Total)
