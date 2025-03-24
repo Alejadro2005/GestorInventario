@@ -1,1 +1,14 @@
-{}
+[
+    {
+        "id": 1,
+        "fecha": "24/03/2025",
+        "productos_vendidos": [
+            [
+                3,
+                40
+            ]
+        ],
+        "id_empleado": 2,
+        "total": 800.0
+    }
+]

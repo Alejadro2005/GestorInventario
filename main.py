@@ -82,7 +82,7 @@ def main():
                         nombre = input("Nombre: ")
                         precio = float(input("Precio $: "))
                         cantidad = int(input("Cantidad inicial: "))
-                        categoria = input("Categoría: ")
+                        categoria = input("Categoría:(electronica o escolar en minuscula) ")
                         stock_minimo = int(input("Stock mínimo: "))
 
                         nuevo = Producto(id, nombre, precio, cantidad, categoria, stock_minimo)
@@ -112,7 +112,8 @@ def main():
                         guardar_inventario(inventario)
                     except Exception as e:
                         print(f"\n❌ Error: {str(e)}")
-                    input("\nPresione E4nter para continuar...")
+                    input("\nPresione Enter para continuar...")
+
                 elif op == "4":  # Visualizar inventario completo
                     try:
                         mostrar_titulo("inventario completo")
@@ -126,16 +127,22 @@ def main():
                                 categoria = p.categoria[:10] + "..." if len(p.categoria) > 10 else p.categoria
 
                                 print(f"""
-                        🆔 ID: {p.id}
-                        📦 Producto: {nombre}
-                        💲 Precio: ${p.precio:.2f}
-                        📥 Stock: {p.cantidad} unidades
-                        🚨 Mínimo requerido: {p.stock_minimo}
-                        📂 Categoría: {categoria}
-                        ───────────────────────────""")
+                🆔 ID: {p.id}
+                📦 Producto: {nombre}
+                💲 Precio: ${p.precio:.2f}
+                📥 Stock: {p.cantidad} unidades
+                🚨 Mínimo requerido: {p.stock_minimo}
+                📂 Categoría: {categoria}
+                ───────────────────────────""")
                     except Exception as e:
                         print(f"\n❌ Error: {str(e)}")
                     input("\nPresione Enter para continuar...")
+
+                elif op == "5":
+                    break
+                else:
+                    print("\n⚠️ Opción inválida")
+                    input("Presione Enter para continuar...")
 
         elif opcion == "2":  # Gestión de Usuarios
             while True:
@@ -188,7 +195,7 @@ def main():
 
                 # Validación de fecha
                 while True:
-                    fecha = input("Fecha (DD/MM/AAAA): ").strip()
+                    fecha = input("Fecha (DD/MM/AAAA) : ").strip()
                     try:
                         day, month, year = map(int, fecha.split('/'))
                         if len(str(year)) == 2:

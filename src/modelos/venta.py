@@ -8,7 +8,7 @@ from src.errores.venta_producto_no_registrado import VentaProductoNoRegistradoEr
 from src.errores.descuento_invalido import DescuentoInvalidoError
 from src.errores.categoria_invalida import CategoriaInvalidaError
 
-CATEGORIAS_VALIDAS = ["Electrónica", "escolar"]
+CATEGORIAS_VALIDAS = ["electronica", "escolar"]
 
 
 class Venta:

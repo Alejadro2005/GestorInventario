@@ -1,1 +1,30 @@
-{}
+[
+    {
+        "id": 1,
+        "nombre": "Alejo",
+        "rol": "admin",
+        "contraseña": "admin123",
+        "fecha_creacion": "2025-03-24T16:31:19.843937"
+    },
+    {
+        "id": 2,
+        "nombre": "jose",
+        "rol": "empleado",
+        "contraseña": "empl123",
+        "fecha_creacion": "2025-03-24T16:31:19.843937"
+    },
+    {
+        "id": 999,
+        "nombre": "jose",
+        "rol": "empleado",
+        "contraseña": "1234",
+        "fecha_creacion": "2025-03-24T16:31:19.843937"
+    },
+    {
+        "id": 1000,
+        "nombre": "jose",
+        "rol": "empleado",
+        "contraseña": "1234",
+        "fecha_creacion": "2025-03-24T16:31:19.843937"
+    }
+]

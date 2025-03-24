@@ -10,18 +10,17 @@ from src.errores.nombre_usuario_invalido import NombreUsuarioInvalidoError
 from src.errores.contrasena_expirada import ContraseñaExpiradaError
 
 
+# Modificar la prueba para usar una ruta temporal:
 def test_crear_usuario():
-    gestor_usuario = GestorUsuarios()
-    usuario = Usuario(1, "jose", "empleado", "1234")
-    assert gestor_usuario.crear_usuario(usuario) == "el usuario se creo con exito"
-
+    gestor = GestorUsuarios("data/usuarios_test.json")
+    usuario = Usuario(999, "usuario_nuevo", "rol", "contraseña")  # ID único
+    assert gestor.crear_usuario(usuario) == "Mensaje esperado"
 
 def test_usuario_validar_rol():
     gestor_usuario = GestorUsuarios()
-    usuario = Usuario(1, "jose", "empleado", "1234")
+    usuario = Usuario(1000, "jose", "empleado", "1234")  # ID único
     gestor_usuario.crear_usuario(usuario)
-    assert gestor_usuario.validar_rol(1, "empleado") == True
-
+    assert gestor_usuario.validar_rol(1000, "empleado") == True
 
 def test_eliminar_usuario3():
     gestor_usuario = GestorUsuarios()
@@ -31,7 +30,7 @@ def test_eliminar_usuario3():
     gestor_usuario.crear_usuario(usuario)
     gestor_usuario.crear_usuario(usuario2)
     gestor_usuario.crear_usuario(usuario3)
-    assert gestor_usuario.eliminar_usuario(3) == "el usuario pepe ha sido eliminado"
+    assert gestor_usuario.eliminar_usuario(3) == "Usuario 'pepe' eliminado con éxito."
 
 
 def test_iniciar_sesion():

@@ -25,10 +25,9 @@ def test_registrar_venta1():
     gestor_inventario.agregar_producto(producto2)
     productos_vendidos = [(producto1, 1), (producto2, 2)]
     venta = Venta(1, "04/03/25", productos_vendidos, 1, gestor_inventario)
-    gestor_ventas = Tienda()
-    ventas_actualizadas = gestor_ventas.registrar_venta(venta, gestor_inventario)
-    assert len(ventas_actualizadas) == 1
-
+    gestor_ventas = Tienda(gestor_inventario)  # ✅ Pasar inventario
+    gestor_ventas.registrar_venta(venta, gestor_inventario)
+    assert len(gestor_ventas.historial_ventas) == 1  # ✅ Verificar el historial
 
 def test_registrar_venta3():
     producto1 = Producto(1, "lapiz", 500, 10, "escolar", 10)
@@ -41,7 +40,7 @@ def test_registrar_venta3():
     productos_vendidos = [(producto1, 2), (producto2, 1)]
     venta = Venta(1, "04/03/25", productos_vendidos, 1, gestor_inventario)
 
-    gestor_ventas = Tienda()
+    gestor_ventas = Tienda(gestor_inventario)
     gestor_ventas.registrar_venta(venta, gestor_inventario)
 
     assert len(gestor_ventas.historial_ventas) == 1
@@ -206,13 +205,12 @@ def test_registrar_venta_stock_insuficiente2():
 
 
 def test_venta_sin_empleado():
-    producto = Producto(6, "Mouse", 30, 1, "Electrónica", 1)
+    producto = Producto(6, "Mouse", 30, 1, "electronica", 1)  # ✅ "electronica" (sin tilde)
     productos_vendidos = [(producto, 30)]
     inventario = Inventario()
     inventario.agregar_producto(producto)
     with pytest.raises(VentaSinEmpleadoError):
         Venta(15, "04/03/25", productos_vendidos, None, inventario)
-
 
 def test_venta_producto_categoria_invalida():
     producto = Producto(8, "Cámara", 500, 1, "Categoría Fantasma", 1)  # Categoría inexistente

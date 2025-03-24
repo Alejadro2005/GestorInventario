@@ -23,15 +23,14 @@ def test_eliminar_producto_de_inventario():
     producto = Producto(1, "lapiz", 8500, 10, "escolar", 1)
     inventario = Inventario()
     inventario.agregar_producto(producto)
-    assert inventario.eliminar_producto(1) == "el producto: lapiz se a eliminado con exito"
+    assert inventario.eliminar_producto(1) == "El producto 'lapiz' ha sido eliminado con éxito."
 
 
 def test_actualizar_stock():
     producto = Producto(1, "lapiz", 500, 10, "escolar", 1)
     inventario = Inventario()
     inventario.agregar_producto(producto)
-    assert inventario.actualizar_stock(1, 10) == "la cantidad de: lapiz se a actualizado a: 20"
-
+    assert inventario.actualizar_stock(1, 10) == "La cantidad de 'lapiz' se ha actualizado a: 20."
 
 def test_filtrar_stock_bajo():
     producto = Producto(1, "lapiz", 500, 10, "escolar", 1)

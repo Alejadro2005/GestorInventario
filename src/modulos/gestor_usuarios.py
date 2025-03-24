@@ -5,11 +5,10 @@ from .persistencia import PersistenciaJSON
 
 RUTA_USUARIOS = "data/usuarios.json"
 
-
 class GestorUsuarios:
-    def __init__(self):
-        """Carga los usuarios desde el archivo JSON al iniciar."""
+    def __init__(self, ruta_usuarios=RUTA_USUARIOS):
         self.usuarios = {}
+        datos = PersistenciaJSON.cargar_datos(ruta_usuarios)
         datos = PersistenciaJSON.cargar_datos(RUTA_USUARIOS)
         for u in datos:
             try:

@@ -1,1 +1,26 @@
-{}
+[
+    {
+        "id": 8,
+        "nombre": "Cámara",
+        "precio": 500,
+        "cantidad": 1,
+        "categoria": "Categoría Fantasma",
+        "stock_minimo": 1
+    },
+    {
+        "id": 3,
+        "nombre": "1",
+        "precio": 20.0,
+        "cantidad": 20,
+        "categoria": "electronica",
+        "stock_minimo": 5
+    },
+    {
+        "id": 2,
+        "nombre": "Cartulina",
+        "precio": 2000.0,
+        "cantidad": 200,
+        "categoria": "escolar",
+        "stock_minimo": 5
+    }
+]
