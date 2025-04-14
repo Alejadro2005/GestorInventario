@@ -126,4 +126,10 @@ pytest tests/test_tienda.py -k "test_stock_insuficiente"
 # Generar reporte HTML de cobertura
 pytest --cov=src --cov-report=html
 ```
+## ejecutar la imagen de docker 
+y descargar todas las librerias 
 
+- pip install -r requirements.txt
+
+ y aparecera la imagen 
+>> docker-compose up --build
