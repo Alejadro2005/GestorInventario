@@ -10,18 +10,40 @@ RUTA_VENTAS = "data/ventas.json"
 
 class Tienda:
     def __init__(self, inventario: Inventario):
+        """
+        Inicializa la tienda con el inventario y carga el historial de ventas.
+
+        Args:
+            inventario (Inventario): El inventario asociado a la tienda.
+
+        Returns:
+            None
+        """
         self.inventario = inventario
         self.historial_ventas = self.cargar_ventas()
 
     def cargar_ventas(self):
-        """Carga el historial de ventas usando PersistenciaJSON"""
+        """
+        Carga el historial de ventas desde un archivo JSON utilizando PersistenciaJSON.
+
+        Returns:
+            list: Una lista de objetos de venta reconstruidos a partir de los datos cargados.
+        """
         datos = PersistenciaJSON.cargar_datos(RUTA_VENTAS)
         return [self._reconstruir_venta(v) for v in datos]
 
     def _reconstruir_venta(self, datos_venta):
+        """
+        Reconstruye una venta a partir de los datos cargados desde el archivo.
+
+        Args:
+            datos_venta (dict): Un diccionario con los datos de una venta.
+
+        Returns:
+            Venta: Un objeto de la clase Venta reconstruido a partir de los datos.
+        """
         productos_vendidos = []
         for item in datos_venta.get("productos_vendidos", []):
-            # Manejar formato antiguo (listas) y nuevo (diccionarios)
             if isinstance(item, list):  # Formato antiguo: [id, cantidad]
                 producto_id, cantidad = item[0], item[1]
             else:  # Formato nuevo: {"id_producto": X, "cantidad": Y}
@@ -41,12 +63,30 @@ class Tienda:
         )
 
     def guardar_ventas(self):
-        """Guarda usando PersistenciaJSON y manteniendo formato"""
+        """
+        Guarda el historial de ventas en un archivo JSON utilizando PersistenciaJSON.
+
+        Returns:
+            None
+        """
         datos = [venta.to_dict() for venta in self.historial_ventas]
         PersistenciaJSON.guardar_datos(RUTA_VENTAS, datos)
 
     def registrar_venta(self, venta: Venta, inventario: Inventario):
-        """Versión original con validaciones preservadas"""
+        """
+        Registra una nueva venta, validando el stock y reduciendo el inventario.
+
+        Args:
+            venta (Venta): La venta a registrar.
+            inventario (Inventario): El inventario asociado a la tienda.
+
+        Returns:
+            str: Mensaje de éxito con el total de la venta.
+
+        Raises:
+            VentaProductoNoRegistradoError: Si algún producto no está registrado en el inventario.
+            StockInsuficienteError: Si no hay suficiente stock para alguno de los productos vendidos.
+        """
         for producto, cantidad in venta.productos_vendidos:
             producto_en_inventario = next((p for p in inventario.productos if p.id == producto.id), None)
 
@@ -65,7 +105,12 @@ class Tienda:
         return f"Venta registrada con éxito. Total: {venta.total}"
 
     def generar_historial(self):
-        """Muestra nombres reales con formato amigable"""
+        """
+        Genera un historial de ventas con formato amigable y nombres reales.
+
+        Returns:
+            list: Una lista de diccionarios representando el historial de ventas, con formato amigable.
+        """
         return [
             {
                 "id": v.id,
@@ -77,6 +122,16 @@ class Tienda:
         ]
 
     def validar_stock_venta(self, id_producto: int, cantidad: int, inventario: Inventario) -> bool:
-        """Método original sin modificaciones para los tests"""
+        """
+        Valida si hay suficiente stock de un producto para realizar una venta.
+
+        Args:
+            id_producto (int): El ID del producto que se quiere validar.
+            cantidad (int): La cantidad que se quiere vender.
+            inventario (Inventario): El inventario de la tienda.
+
+        Returns:
+            bool: `True` si hay suficiente stock, `False` en caso contrario.
+        """
         producto = next((p for p in inventario.productos if p.id == id_producto), None)
         return producto is not None and producto.cantidad >= cantidad

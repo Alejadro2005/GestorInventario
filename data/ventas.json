@@ -1,14 +1,18 @@
 [
     {
         "id": 1,
-        "fecha": "24/03/2025",
+        "fecha": "20/04/2025",
         "productos_vendidos": [
             [
-                3,
-                40
+                1,
+                1
+            ],
+            [
+                2,
+                2
             ]
         ],
         "id_empleado": 2,
-        "total": 800.0
+        "total": 62000.0
     }
 ]

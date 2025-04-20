@@ -1,0 +1,61 @@
+#:import dp kivy.metrics.dp
+
+<LoginScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(15)
+        canvas.before:
+            Color:
+                rgba: 0.95, 0.95, 0.95, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: '[b]LOGIN ADMIN[/b]'
+            markup: True
+            font_size: dp(24)
+            color: 0.1, 0.4, 0.8, 1
+            size_hint_y: None
+            height: dp(40)
+
+        GridLayout:
+            cols: 2
+            spacing: dp(10)
+            row_default_height: dp(40)
+            size_hint_y: None
+            height: self.minimum_height
+
+            Label:
+                text: 'ID Usuario:'
+                color: 0.2, 0.2, 0.2, 1
+            TextInput:
+                id: id_usuario
+                input_filter: 'int'
+                hint_text: 'Ej: 1001'
+                background_color: 1, 1, 1, 1
+
+            Label:
+                text: 'Contraseña:'
+                color: 0.2, 0.2, 0.2, 1
+            TextInput:
+                id: password
+                password: True
+                hint_text: '********'
+                background_color: 1, 1, 1, 1
+
+        BoxLayout:
+            spacing: dp(10)
+            size_hint_y: None
+            height: dp(50)
+
+            Button:
+                text: 'INGRESAR'
+                background_color: 0.1, 0.6, 0.3, 1
+                on_press: root.verificar_credenciales()
+
+            Button:
+                text: 'CANCELAR'
+                background_color: 0.7, 0.1, 0.1, 1
+                on_press: root.manager.current = 'main'

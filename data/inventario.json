@@ -1,26 +1,26 @@
-[
-    {
-        "id": 8,
-        "nombre": "Cámara",
-        "precio": 500,
-        "cantidad": 1,
-        "categoria": "Categoría Fantasma",
+{
+    "1": {
+        "id": 1,
+        "nombre": "Cuaderno",
+        "precio": 2000.0,
+        "cantidad": 0,
+        "categoria": "escolar",
         "stock_minimo": 1
     },
-    {
-        "id": 3,
-        "nombre": "1",
-        "precio": 20.0,
-        "cantidad": 20,
+    "2": {
+        "id": 2,
+        "nombre": "Libro",
+        "precio": 30000.0,
+        "cantidad": 18,
+        "categoria": "escolar",
+        "stock_minimo": 10
+    },
+    "4": {
+        "id": 4,
+        "nombre": "cabre",
+        "precio": 13000.0,
+        "cantidad": 10,
         "categoria": "electronica",
         "stock_minimo": 5
-    },
-    {
-        "id": 2,
-        "nombre": "Cartulina",
-        "precio": 2000.0,
-        "cantidad": 200,
-        "categoria": "escolar",
-        "stock_minimo": 5
     }
-]
+}

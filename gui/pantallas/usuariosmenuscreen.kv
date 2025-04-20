@@ -1,0 +1,49 @@
+#:import dp kivy.metrics.dp
+
+<UsuariosMenuScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(15)
+        canvas.before:
+            Color:
+                rgba: 0.95, 0.95, 0.95, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: '[b]GESTIÓN DE USUARIOS[/b]'
+            markup: True
+            font_size: dp(24)
+            color: 0.1, 0.4, 0.8, 1
+            size_hint_y: None
+            height: dp(40)
+
+        GridLayout:
+            cols: 2
+            spacing: dp(10)
+            row_default_height: dp(50)
+            size_hint_y: 0.8
+
+            Button:
+                text: 'Crear Usuario'
+                background_color: 0.1, 0.8, 0.4, 1
+                on_press: root.mostrar_submenu('1')
+
+            Button:
+                text: 'Eliminar Usuario'
+                background_color: 0.8, 0.1, 0.1, 1
+                on_press: root.mostrar_submenu('2')
+
+            Button:
+                text: 'Listar Usuarios'
+                background_color: 0.1, 0.4, 0.8, 1
+                on_press: root.mostrar_submenu('3')
+
+        Button:
+            text: 'Volver al Menú Principal'
+            background_color: 0.6, 0.6, 0.6, 1
+            size_hint_y: None
+            height: dp(50)
+            on_press: root.mostrar_submenu('4')

@@ -1,0 +1,36 @@
+<BasePopup@Popup>:
+    title_size: '20sp'
+    title_align: 'center'
+    separator_color: 0.1, 0.4, 0.8, 1
+    size_hint: (0.8, 0.4)
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(10)
+
+        Label:
+            text: root.title
+            font_size: '18sp'
+            color: root.title_color
+            bold: True
+
+        Label:
+            text: root.message
+            color: 0.1, 0.1, 0.1, 1
+            text_size: self.width, None
+
+        Button:
+            text: 'Aceptar'
+            size_hint_y: None
+            height: dp(50)
+            background_color: root.button_color
+            on_press: root.dismiss()
+
+<ErrorPopup>:
+    title_color: 0.8, 0.1, 0.1, 1
+    button_color: 0.8, 0.1, 0.1, 1
+
+<SuccessPopup>:
+    title_color: 0.1, 0.8, 0.4, 1
+    button_color: 0.1, 0.4, 0.8, 1
