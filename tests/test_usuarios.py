@@ -8,9 +8,23 @@ from src.errores.contrasena_invalida import ContraseñaInvalidaError
 from src.errores.rol_invalido import RolInvalidoError
 from src.errores.nombre_usuario_invalido import NombreUsuarioInvalidoError
 from src.errores.contrasena_expirada import ContraseñaExpiradaError
+from src.database.sqlite_database import SQLiteDatabase
 
+@pytest.fixture
+def db():
+    """Fixture que proporciona una instancia de base de datos para las pruebas."""
+    db = SQLiteDatabase(":memory:")
+    db.connect()
+    db.create_tables()
+    yield db
+    db.disconnect()
 
-def test_crear_usuario():
+@pytest.fixture
+def gestor(db):
+    """Fixture que proporciona una instancia de GestorUsuarios para las pruebas."""
+    return GestorUsuarios(db)
+
+def test_crear_usuario(gestor):
     """
     Test para verificar que se puede crear un usuario correctamente.
 
@@ -20,13 +34,12 @@ def test_crear_usuario():
     Asserts:
         str: El mensaje esperado de confirmación de creación del usuario.
     """
-    gestor = GestorUsuarios("src/data/usuarios_test.json")
     usuario = Usuario(1, "usuario_nuevo", "admin", "contraseña")  # ID único
     mensaje_esperado = "Usuario 'usuario_nuevo' creado con éxito."
     assert gestor.crear_usuario(usuario) == mensaje_esperado
 
 
-def test_usuario_validar_rol():
+def test_usuario_validar_rol(gestor):
     """
     Test para verificar que el rol de un usuario se valide correctamente.
 
@@ -36,13 +49,12 @@ def test_usuario_validar_rol():
     Asserts:
         bool: True si el rol del usuario coincide con el proporcionado.
     """
-    gestor_usuario = GestorUsuarios("src/data/usuarios_test.json")
     usuario = Usuario(1000, "jose", "empleado", "1234")  # ID único
-    gestor_usuario.crear_usuario(usuario)
-    assert gestor_usuario.validar_rol(1000, "empleado") == True
+    gestor.crear_usuario(usuario)
+    assert gestor.validar_rol(1000, "empleado") == True
 
 
-def test_eliminar_usuario3():
+def test_eliminar_usuario3(gestor):
     """
     Test para verificar que se pueda eliminar un usuario correctamente.
 
@@ -52,14 +64,13 @@ def test_eliminar_usuario3():
     Asserts:
         str: El mensaje esperado de confirmación de eliminación del usuario.
     """
-    gestor_usuario = GestorUsuarios("src/data/usuarios_test.json")
     usuario = Usuario(1, "jose", "empleado", "1234")
     usuario2 = Usuario(2, "alejandro", "empleado", "4321")
     usuario3 = Usuario(3, "pepe", "empleado", "9876")
-    gestor_usuario.crear_usuario(usuario)
-    gestor_usuario.crear_usuario(usuario2)
-    gestor_usuario.crear_usuario(usuario3)
-    assert gestor_usuario.eliminar_usuario(3) == "Usuario 'pepe' eliminado con éxito."
+    gestor.crear_usuario(usuario)
+    gestor.crear_usuario(usuario2)
+    gestor.crear_usuario(usuario3)
+    assert gestor.eliminar_usuario(3) == "Usuario 'pepe' eliminado con éxito."
 
 
 def test_iniciar_sesion():
@@ -102,7 +113,7 @@ def test_iniciar_sesion2():
 
 
 # Tests Error
-def test_crear_usuario_duplicado():
+def test_crear_usuario_duplicado(gestor):
     """
     Test para verificar que no se permita crear un usuario con un ID duplicado.
 
@@ -112,38 +123,33 @@ def test_crear_usuario_duplicado():
     Raises:
         UsuarioDuplicadoError: Si se intenta registrar un usuario con un ID existente.
     """
-    gestor_usuario = GestorUsuarios("src/data/usuarios_test.json")
     usuario = Usuario(1, "jose", "empleado", "1234")
-    gestor_usuario.crear_usuario(usuario)
+    gestor.crear_usuario(usuario)
 
     with pytest.raises(UsuarioDuplicadoError, match="El usuario con ID 1 ya existe"):
-        gestor_usuario.crear_usuario(usuario)
+        gestor.crear_usuario(usuario)
 
 
-def test_validar_rol_usuario_no_existente():
+def test_validar_rol_usuario_no_existente(gestor):
     """
     Test para verificar que se lanza una excepción al validar el rol de un usuario inexistente.
 
     Raises:
         UsuarioNoEncontradoError: Si se intenta validar el rol de un usuario no registrado.
     """
-    gestor_usuario = GestorUsuarios()
-
     with pytest.raises(UsuarioNoEncontradoError, match="El usuario con ID 99 no existe"):
-        gestor_usuario.validar_rol(99, "empleado")
+        gestor.validar_rol(99, "empleado")
 
 
-def test_eliminar_usuario_inexistente():
+def test_eliminar_usuario_inexistente(gestor):
     """
     Test para verificar que se lanza una excepción al intentar eliminar un usuario inexistente.
 
     Raises:
         UsuarioNoEncontradoError: Si se intenta eliminar un usuario no registrado.
     """
-    gestor_usuario = GestorUsuarios()
-
     with pytest.raises(UsuarioNoEncontradoError, match="El usuario con ID 99 no existe"):
-        gestor_usuario.eliminar_usuario(99)
+        gestor.eliminar_usuario(99)
 
 
 def test_crear_usuario_contraseña_invalida():
@@ -250,18 +256,16 @@ def test_crear_usuario_con_rol_inexistente():
         Usuario(11, "carlos", "superheroe", "Pass1234")
 
 
-def test_validar_rol_usuario_eliminado():
+def test_validar_rol_usuario_eliminado(gestor):
     """
-    Test para verificar que no se puede validar el rol de un usuario que ya fue eliminado.
+    Test para verificar que se lanza una excepción al validar el rol de un usuario eliminado.
 
     Raises:
-        UsuarioNoEncontradoError: Si se intenta acceder a un usuario eliminado del sistema.
+        UsuarioNoEncontradoError: Si se intenta validar el rol de un usuario eliminado.
     """
-    gestor_usuario = GestorUsuarios()
-    usuario = Usuario(13, "luis", "empleado", "ClaveSegura1")
+    usuario = Usuario(1, "jose", "empleado", "1234")
+    gestor.crear_usuario(usuario)
+    gestor.eliminar_usuario(1)
 
-    gestor_usuario.crear_usuario(usuario)
-    gestor_usuario.eliminar_usuario(13)
-
-    with pytest.raises(UsuarioNoEncontradoError, match="El usuario con ID 13 no existe"):
-        gestor_usuario.validar_rol(13, "empleado")
+    with pytest.raises(UsuarioNoEncontradoError, match="El usuario con ID 1 no existe"):
+        gestor.validar_rol(1, "empleado")

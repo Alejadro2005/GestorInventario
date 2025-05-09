@@ -9,12 +9,13 @@ from src.modelos.venta import Venta
 from src.errores import *
 from datetime import datetime
 import os
+from src.database.database_interface import DatabaseInterface
 
 
 class ConsoleUI:
-    def __init__(self):
-        self.gestor = GestorUsuarios()
-        self.inventario = self._cargar_inventario()
+    def __init__(self, inventario: Inventario, gestor_usuarios: GestorUsuarios):
+        self.gestor = gestor_usuarios
+        self.inventario = inventario
         self.tienda = Tienda(self.inventario)
 
     def _cargar_inventario(self, ruta: str = "data/inventario.json") -> Inventario:
@@ -114,7 +115,6 @@ class ConsoleUI:
 
             nuevo = Producto(id, nombre, precio, cantidad, categoria, stock_minimo)
             self.inventario.agregar_producto(nuevo)
-            self._guardar_inventario()
             print("\n✅ Producto agregado correctamente!")
         except Exception as e:
             print(f"\n❌ Error: {str(e)}")
@@ -125,7 +125,6 @@ class ConsoleUI:
             self._mostrar_titulo("eliminar producto")
             id = int(input("ID del producto a eliminar: "))
             print(f"\n{self.inventario.eliminar_producto(id)}")
-            self._guardar_inventario()
         except Exception as e:
             print(f"\n❌ Error: {str(e)}")
         self._esperar_continuar()
@@ -136,7 +135,6 @@ class ConsoleUI:
             id = int(input("ID del producto: "))
             cantidad = int(input("Nueva cantidad: "))
             print(f"\n{self.inventario.actualizar_stock(id, cantidad)}")
-            self._guardar_inventario()
         except Exception as e:
             print(f"\n❌ Error: {str(e)}")
         self._esperar_continuar()
@@ -144,19 +142,20 @@ class ConsoleUI:
     def _mostrar_inventario(self):
         try:
             self._mostrar_titulo("inventario completo")
-            if not self.inventario.productos:
+            productos = self.inventario.db.get_all_products()
+            if not productos:
                 print("\n📭 El inventario está vacío")
             else:
                 print("\n📦 Lista de Productos:")
-                for p in self.inventario.productos:
-                    nombre = p.nombre[:20] + "..." if len(p.nombre) > 20 else p.nombre
-                    categoria = p.categoria[:10] + "..." if len(p.categoria) > 10 else p.categoria
+                for p in productos:
+                    nombre = p['nombre'][:20] + "..." if len(p['nombre']) > 20 else p['nombre']
+                    categoria = p['categoria'][:10] + "..." if len(p['categoria']) > 10 else p['categoria']
                     print(f"""
-                🆔 ID: {p.id}
+                🆔 ID: {p['id']}
                 📦 Producto: {nombre}
-                💲 Precio: ${p.precio:.2f}
-                📥 Stock: {p.cantidad} unidades
-                🚨 Mínimo requerido: {p.stock_minimo}
+                💲 Precio: {int(p['precio']):,}
+                📥 Stock: {p['cantidad']} unidades
+                🚨 Mínimo requerido: {p['stock_minimo']}
                 📂 Categoría: {categoria}
                 ───────────────────────────""")
         except Exception as e:
@@ -187,18 +186,24 @@ class ConsoleUI:
         self._esperar_continuar()
 
     def _listar_usuarios(self):
-        self._mostrar_titulo("usuarios registrados")
-        if not self.gestor.usuarios:
-            print("\n📭 No hay usuarios registrados")
-        else:
-            for id, usuario in self.gestor.usuarios.items():
-                print(f"🆔 ID: {id} | 👤 {usuario.nombre} | 🛠 Rol: {usuario.rol}")
+        try:
+            self._mostrar_titulo("usuarios registrados")
+            usuarios = self.gestor.db.get_all_users()
+            if not usuarios:
+                print("\n📭 No hay usuarios registrados")
+            else:
+                for usuario in usuarios:
+                    print(f"🆔 ID: {usuario['id']} | 👤 {usuario['nombre']} | 🛠 Rol: {usuario['rol']}")
+        except Exception as e:
+            print(f"\n❌ Error: {str(e)}")
         self._esperar_continuar()
 
     def _registrar_venta(self):
         try:
             self._mostrar_titulo("nueva venta")
-            id_venta = len(self.tienda.historial_ventas) + 1
+            # Obtener el siguiente ID de venta basado en el historial actual
+            historial = self.tienda.generar_historial()
+            id_venta = len(historial) + 1
 
             # Validación de fecha
             while True:
@@ -233,15 +238,20 @@ class ConsoleUI:
                     if entrada in ["0", "T", "t"]: break
 
                     id_producto = int(entrada)
-                    producto = next(p for p in self.inventario.productos if p.id == id_producto)
+                    productos_db = self.inventario.db.get_all_products()
+                    producto = next(p for p in productos_db if p['id'] == id_producto)
                     cantidad = int(input("Cantidad: "))
 
                     if cantidad <= 0:
                         print("❌ La cantidad debe ser mayor a 0")
                         continue
 
+                    if producto['cantidad'] < cantidad:
+                        print(f"❌ Stock insuficiente. Disponible: {producto['cantidad']}")
+                        continue
+
                     productos.append((producto, cantidad))
-                    print(f"✅ Añadido: {producto.nombre} x{cantidad}")
+                    print(f"✅ Añadido: {producto['nombre']} x{cantidad}")
                 except StopIteration:
                     print("❌ Error: El producto no existe")
                 except ValueError:
@@ -254,32 +264,42 @@ class ConsoleUI:
 
             venta = Venta(id_venta, fecha, productos, id_empleado, self.inventario)
             resultado = self.tienda.registrar_venta(venta, self.inventario)
-            self._guardar_inventario()
             print(f"\n{resultado}")
         except Exception as e:
             print(f"\n❌ Error crítico: {str(e)}")
         self._esperar_continuar()
 
     def _mostrar_historial_ventas(self):
-        self._limpiar_pantalla()
-        self._mostrar_titulo("historial de ventas")
-        historial = self.tienda.generar_historial()
-        if not historial:
-            print("\n📭 No hay ventas registradas")
-        else:
-            for venta in historial:
-                print(f"\n🛒 Venta #{venta['id']}")
-                print(f"📅 Fecha: {venta['fecha']}")
-                print("📦 Productos:")
-                for p in venta['productos']: print(f"   - {p}")
-                print(f"💵 Total: ${venta['total']:.2f}")
-                print(f"👤 Empleado ID: {venta['empleado']}")
-                print("-" * 50)
-        self._esperar_continuar()
+        while True:
+            self._limpiar_pantalla()
+            self._mostrar_titulo("historial de ventas")
+            historial = self.tienda.generar_historial()
+            if not historial:
+                print("\n📭 No hay ventas registradas")
+            else:
+                for venta in historial:
+                    print(f"\n🛒 Venta #{venta['id']}")
+                    print(f"📅 Fecha: {venta['fecha']}")
+                    print("📦 Productos:")
+                    for p in venta['productos']: print(f"   - {p}")
+                    print(f"💵 Total: {int(venta['total']):,}")
+                    print(f"👤 Empleado ID: {venta['empleado']}")
+                    print("-" * 50)
+            print("\n1. Borrar historial de ventas")
+            print("2. Volver al menú principal")
+            op = input("\nSeleccione una opción: ").strip()
+            if op == "1":
+                mensaje = self.tienda.borrar_historial_ventas()
+                print(f"\n✅ {mensaje}")
+                self._esperar_continuar()
+            elif op == "2":
+                break
+            else:
+                print("\n❌ Opción inválida")
+                self._esperar_continuar()
 
     def _mostrar_error(self, mensaje):
-        print(f"\n⚠️ {mensaje}")
-        self._esperar_continuar()
+        print(f"\n❌ Error: {mensaje}")
 
     def _esperar_continuar(self):
         input("\nPresione Enter para continuar...")
@@ -287,18 +307,19 @@ class ConsoleUI:
     def ejecutar(self):
         while True:
             self._limpiar_pantalla()
-            opcion = self._menu_principal()
+            op = self._menu_principal()
 
-            if opcion == "1":
+            if op == "1":
                 self._manejar_gestion_productos()
-            elif opcion == "2":
+            elif op == "2":
                 self._manejar_gestion_usuarios()
-            elif opcion == "3":
+            elif op == "3":
                 self._registrar_venta()
-            elif opcion == "4":
+            elif op == "4":
                 self._mostrar_historial_ventas()
-            elif opcion == "5":
-                print("\n¡Gracias por usar el sistema! 👋")
+            elif op == "5":
+                print("\n👋 ¡Hasta pronto!")
                 break
             else:
                 self._mostrar_error("Opción inválida")
+                self._esperar_continuar()

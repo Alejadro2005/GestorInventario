@@ -21,8 +21,23 @@ class UsuariosMenuScreen(Screen):
 
     Attributes:
         gestor (ObjectProperty): Conexión al gestor de usuarios
+        console_ui (ObjectProperty): Conexión a la interfaz principal
     """
     gestor = ObjectProperty(None)
+    console_ui = ObjectProperty(None)
+
+    def on_pre_enter(self):
+        """Verifica que el usuario tenga sesión de administrador antes de mostrar el menú."""
+        try:
+            if not hasattr(self.console_ui, 'usuario_actual') or not self.console_ui.usuario_actual:
+                self.manager.current = 'login'
+                return
+            if self.console_ui.usuario_actual.rol != "admin":
+                self.mostrar_popup("❌ Error", "Solo usuarios con rol ADMIN pueden acceder")
+                self.manager.current = 'main'
+        except Exception as e:
+            self.mostrar_popup("❌ Error", str(e))
+            self.manager.current = 'main'
 
     def mostrar_submenu(self, opcion: str):
         """
@@ -37,6 +52,16 @@ class UsuariosMenuScreen(Screen):
             '3': 'listar_usuarios',
             '4': 'main'
         }.get(opcion, 'main')
+
+    def mostrar_popup(self, titulo: str, mensaje: str):
+        """
+        Muestra un mensaje emergente.
+
+        Args:
+            titulo (str): Título del popup
+            mensaje (str): Contenido del mensaje
+        """
+        Popup(title=titulo, content=Label(text=mensaje, color=(0, 0, 0, 1)), size_hint=(0.6, 0.4)).open()
 
 
 class CrearUsuarioScreen(Screen):
@@ -134,6 +159,20 @@ class ListarUsuariosScreen(Screen):
 
     def on_pre_enter(self):
         """Prepara los datos de usuarios antes de mostrar la pantalla."""
-        self.ids.lista_usuarios.data = [{
-            'texto': f"ID: {id} | Nombre: {usuario.nombre} | Rol: {usuario.rol.capitalize()}"
-        } for id, usuario in self.gestor.usuarios.items()]
+        try:
+            usuarios = self.gestor.db.get_all_users()
+            self.ids.lista_usuarios.data = [{
+                'texto': f"ID: {usuario['id']} | Nombre: {usuario['nombre']} | Rol: {usuario['rol'].capitalize()}"
+            } for usuario in usuarios]
+        except Exception as e:
+            self.mostrar_popup("❌ Error", str(e))
+
+    def mostrar_popup(self, titulo: str, mensaje: str):
+        """
+        Muestra un mensaje emergente.
+
+        Args:
+            titulo (str): Título del popup
+            mensaje (str): Contenido del mensaje
+        """
+        Popup(title=titulo, content=Label(text=mensaje, color=(0, 0, 0, 1)), size_hint=(0.6, 0.4)).open()

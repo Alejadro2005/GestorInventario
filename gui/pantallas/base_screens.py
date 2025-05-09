@@ -6,7 +6,7 @@ Incluye widgets personalizados y pantallas principales reutilizables.
 
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import StringProperty
+from kivy.properties import StringProperty, ObjectProperty
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 
@@ -44,6 +44,8 @@ class LoginScreen(Screen):
         verificar_credenciales: Valida usuario y contraseña
         mostrar_popup: Muestra mensajes emergentes
     """
+    console_ui = ObjectProperty(None)
+    destino = StringProperty('usuarios_menu')  # Por defecto va a usuarios_menu
 
     def verificar_credenciales(self):
         """Valida las credenciales de acceso contra el gestor de usuarios."""
@@ -55,7 +57,8 @@ class LoginScreen(Screen):
             if usuario.rol != "admin":
                 raise ValueError("Solo usuarios con rol ADMIN pueden ingresar")
             usuario.iniciar_sesion(password)
-            self.manager.current = 'productos_menu'
+            self.console_ui.usuario_actual = usuario
+            self.manager.current = self.destino
         except Exception as e:
             self.mostrar_popup("❌ Error de Login", str(e))
 

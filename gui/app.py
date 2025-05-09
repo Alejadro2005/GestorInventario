@@ -9,6 +9,9 @@ from kivy.lang import Builder
 from kivy.core.window import Window
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
+from src.database.database_interface import DatabaseInterface
+from src.modelos.inventario import Inventario
+from src.modulos.gestor_usuarios import GestorUsuarios
 
 # Cargar archivos .kv (mantener igual)
 kv_files = [
@@ -24,8 +27,7 @@ kv_files = [
     'gui/pantallas/eliminarusuarioscreen.kv',
     'gui/pantallas/eliminarproductoscreen.kv',
     'gui/pantallas/loginscreen.kv',
-    'gui/pantallas/actualizarstockscreen.kv',
-    'gui/componentes/popups.kv'
+    'gui/pantallas/actualizarstockscreen.kv'
 ]
 
 for kv_file in kv_files:
@@ -34,9 +36,12 @@ for kv_file in kv_files:
 Window.clearcolor = (1, 1, 1, 1)
 
 class TiendaApp(App):
-    def __init__(self, **kwargs):
+    def __init__(self, db: DatabaseInterface, **kwargs):
         super().__init__(**kwargs)
-        self.console_ui = ConsoleUI()
+        self.db = db
+        self.inventario = Inventario(db)
+        self.gestor_usuarios = GestorUsuarios(db)
+        self.console_ui = ConsoleUI(self.inventario, self.gestor_usuarios)
         self.sm = ScreenManager()
 
     def build(self):
@@ -49,17 +54,17 @@ class TiendaApp(App):
             ('login', LoginScreen, {'console_ui': self.console_ui}),
             ('productos_menu', ProductosMenuScreen, {'console_ui': self.console_ui}),
             ('agregar_producto', AgregarProductoScreen,
-             {'inventario': self.console_ui.inventario, 'console_ui': self.console_ui}),
+             {'inventario': self.inventario, 'console_ui': self.console_ui}),
             ('eliminar_producto', EliminarProductoScreen,
-             {'inventario': self.console_ui.inventario, 'console_ui': self.console_ui}),
+             {'inventario': self.inventario, 'console_ui': self.console_ui}),
             ('actualizar_stock', ActualizarStockScreen,
-             {'inventario': self.console_ui.inventario, 'console_ui': self.console_ui}),
-            ('ver_inventario', VerInventarioScreen, {'inventario': self.console_ui.inventario}),
-            ('usuarios_menu', UsuariosMenuScreen, {'gestor': self.console_ui.gestor}),
-            ('crear_usuario', CrearUsuarioScreen, {'gestor': self.console_ui.gestor}),
-            ('eliminar_usuario', EliminarUsuarioScreen, {'gestor': self.console_ui.gestor}),
-            ('listar_usuarios', ListarUsuariosScreen, {'gestor': self.console_ui.gestor}),
-            ('ventas', VentasScreen, {'inventario': self.console_ui.inventario, 'tienda': self.console_ui.tienda,
+             {'inventario': self.inventario, 'console_ui': self.console_ui}),
+            ('ver_inventario', VerInventarioScreen, {'inventario': self.inventario}),
+            ('usuarios_menu', UsuariosMenuScreen, {'gestor': self.gestor_usuarios, 'console_ui': self.console_ui}),
+            ('crear_usuario', CrearUsuarioScreen, {'gestor': self.gestor_usuarios, 'console_ui': self.console_ui}),
+            ('eliminar_usuario', EliminarUsuarioScreen, {'gestor': self.gestor_usuarios, 'console_ui': self.console_ui}),
+            ('listar_usuarios', ListarUsuariosScreen, {'gestor': self.gestor_usuarios, 'console_ui': self.console_ui}),
+            ('ventas', VentasScreen, {'inventario': self.inventario, 'tienda': self.console_ui.tienda,
                                       'console_ui': self.console_ui}),
             ('historial', HistorialScreen, {'tienda': self.console_ui.tienda}),
         ]
@@ -69,5 +74,6 @@ class TiendaApp(App):
                 for prop, valor in args[0].items():
                     setattr(pantalla, prop, valor)
             self.sm.add_widget(pantalla)
+
 if __name__ == '__main__':
     TiendaApp().run()

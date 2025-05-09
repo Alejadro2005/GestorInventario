@@ -60,7 +60,7 @@ class Venta:
         return {
             "id": self.id,
             "fecha": self.fecha,
-            "productos_vendidos": [(p.id, cantidad) for p, cantidad in self.productos_vendidos],
+            "productos_vendidos": [(p['id'], cantidad) for p, cantidad in self.productos_vendidos],
             "id_empleado": self.id_empleado,
             "total": self.total
         }
@@ -86,7 +86,7 @@ class Venta:
         Returns:
             float: Total calculado de la venta.
         """
-        return sum(producto.precio * cantidad for producto, cantidad in self.productos_vendidos)
+        return sum(producto['precio'] * cantidad for producto, cantidad in self.productos_vendidos)
 
     def _validar_fecha(self, fecha_str: str) -> str:
         """
@@ -105,7 +105,9 @@ class Venta:
             day, month, year = map(int, fecha_str.split('/'))
             if year < 100:
                 year += 2000
-            datetime(year, month, day)
+            fecha = datetime(year, month, day)
+            if fecha > datetime.now():
+                raise FechaInvalidaError(f"La fecha {fecha_str} no puede ser futura")
             return fecha_str
         except ValueError:
             raise FechaInvalidaError(f"La fecha {fecha_str} es inválida")
@@ -120,10 +122,11 @@ class Venta:
         Raises:
             VentaProductoNoRegistradoError: Si un producto no se encuentra.
         """
+        productos_db = inventario.db.get_all_products()
         for producto, _ in self.productos_vendidos:
-            if not any(p.id == producto.id for p in inventario.productos):
+            if not any(p['id'] == producto['id'] for p in productos_db):
                 raise VentaProductoNoRegistradoError(
-                    f"El producto {producto.nombre} no está registrado en el inventario")
+                    f"El producto {producto['nombre']} no está registrado en el inventario")
 
     def _validar_cantidades(self):
         """
@@ -144,8 +147,8 @@ class Venta:
             CategoriaInvalidaError: Si alguna categoría es inválida.
         """
         for producto, _ in self.productos_vendidos:
-            if producto.categoria.lower() not in [c.lower() for c in CATEGORIAS_VALIDAS]:
-                raise CategoriaInvalidaError(f"La categoría '{producto.categoria}' no es válida")
+            if producto['categoria'].lower() not in [c.lower() for c in CATEGORIAS_VALIDAS]:
+                raise CategoriaInvalidaError(f"La categoría '{producto['categoria']}' no es válida")
 
     def _validar_venta(self):
         """

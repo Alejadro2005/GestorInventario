@@ -44,7 +44,7 @@ class Usuario:
         if any(c for c in rol if not c.isalnum() and c not in {"_", "-"}):
             raise RolInvalidoError(f"El rol '{rol}' contiene caracteres inválidos")
 
-        if rol not in self.ROLES_VALIDOS:
+        if rol.lower() not in {r.lower() for r in self.ROLES_VALIDOS}:
             raise RolInvalidoError(f"El rol '{rol}' no es válido")
 
         if not self.validar_contraseña(contraseña):
@@ -52,7 +52,7 @@ class Usuario:
 
         self.id = id
         self.nombre = nombre
-        self.rol = rol
+        self.rol = rol.lower()  # Normalizar rol a minúsculas
         self.__contraseña = contraseña
         self.fecha_creacion = datetime.now()
 
@@ -136,6 +136,6 @@ class Usuario:
             contraseña (str): Contraseña a validar.
 
         Returns:
-            bool: True si la contraseña tiene al menos 4 caracteres.
+            bool: True si la contraseña tiene al menos 4 caracteres y no está vacía.
         """
-        return len(contraseña) >= 4
+        return len(contraseña) >= 4 and contraseña.strip() != ""

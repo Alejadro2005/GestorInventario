@@ -2,131 +2,206 @@
 ![Pruebas](https://img.shields.io/badge/Pruebas-54_total-ff69b4)
 ![Cobertura](https://img.shields.io/badge/Cobertura-83%25-green)
 
-# 📦 Gestor de Inventario y Ventas  
-Sistema para gestionar productos, ventas y usuarios en un entorno retail. Permite:  
-- **Control de inventario**: Agregar, eliminar y actualizar productos.  
-- **Registro de ventas**: Validar stock y generar historial.  
-- **Gestión de usuarios**: Roles (Admin/Empleado)
+# 📦 Gestor de Inventario y Ventas
 
-## ⚙️ Configuración Inicial
+Sistema integral para la gestión de productos, ventas y usuarios en un entorno retail, con interfaz gráfica (Kivy) y menú por consola.  
+Incluye control de inventario, registro de ventas, gestión de usuarios con roles y pruebas automatizadas.
+
+---
+
+## 🗂️ Estructura del Proyecto
+
+- **src/modelos/**: Modelos de dominio (Usuario, Producto, Venta)
+- **src/database/**: Acceso y gestión de base de datos (ORM, SQLite)
+- **src/gestores/**: Lógica de negocio (GestorUsuarios, Inventario, Venta)
+- **gui/**: Interfaz gráfica de usuario (pantallas Kivy, layouts .kv)
+- **cli/**: Menú por consola
+- **tests/**: Casos de prueba automatizados (pytest)
+- **modelo_relacional.puml**: Diagrama entidad-relación (notación Barker/PlantUML)
+- **database.sql**: Script DDL para crear las tablas
+
+---
+
+## ⚙️ Instalación y Ejecución
 
 ```bash
-# Configuración Inicial (Windows PowerShell)
+# 1. Crear entorno virtual
 python -m venv venv
 .\venv\Scripts\Activate
+
+# 2. Instalar dependencias
 pip install -r requirements.txt
+
+# 3. Variables de entorno (Windows)
 $env:PYTHONPATH = "$(Get-Location)"
-pip install pytest
-pip install kivy
-#Ejecutar interfaz grafica
+
+# 4. Ejecutar interfaz gráfica
 python gui_main.py
+
+# 5. Ejecutar menú por consola
+python cli/main.py
 ```
-
-
-## 📌 Diagrama de Clases
-![Diagrama de Clases](https://github.com/user-attachments/assets/02442fa2-5d86-40f2-b4dd-3cf747bbd67c)
-
-| ID  | Descripción                          | Entrada                                     | Salida Esperada                          | Tipo        |
-|-----|--------------------------------------|---------------------------------------------|------------------------------------------|-------------|
-| 19  | Crear usuario                        | Usuario(1, "Ana", "admin", "Pass123")     | Mensaje de éxito                         | Normal      |
-| 20  | Validar rol                          | ID=1, rol="admin"                         | True                                   | Normal      |
-| 21  | Eliminar usuario                     | ID=3                                      | Mensaje de eliminación                   | Normal      |
-| 22  | Iniciar sesión exitoso               | contraseña="1234"                         | True                                   | Normal      |
-| 23  | Cambiar contraseña                   | nueva_contraseña="4321"                   | Contraseña actualizada                   | Normal      |
-| 24  | Iniciar sesión fallido               | contraseña="0000"                         | False                                  | Normal      |
-| 25  | Usuario duplicado                    | ID repetido                                 | UsuarioDuplicadoError                  | Error       |
-| 26  | Validar rol inexistente              | ID=99                                     | UsuarioNoEncontradoError               | Error       |
-| 27  | Eliminar usuario inexistente         | ID=99                                     | UsuarioNoEncontradoError               | Error       |
-| 28  | Contraseña vacía                     | contraseña=""                             | ContraseñaInvalidaError                | Error       |
-| 29  | Credenciales inválidas               | contraseña="wrong"                        | CredencialesInvalidasError             | Error       |
-| 30  | Cambio a contraseña inválida         | nueva_contraseña=""                       | ContraseñaInvalidaError                | Error       |
-| 31  | Rol con emojis                       | rol="admin🔥"                             | RolInvalidoError                       | Extremo     |
-| 32  | Nombre de 100 caracteres             | nombre="A"*100                            | NombreUsuarioInvalidoError             | Extremo     |
-| 33  | Contraseña expirada                  | Fecha="01/01/2020"                          | ContraseñaExpiradaError                | Extremo     |
-| 34  | Rol inexistente                      | rol="superheroe"                          | RolInvalidoError                       | Extremo     |
-| 35  | Nombre usuario vacío                 | nombre=""                                 | NombreUsuarioInvalidoError             | Extremo     |
-| 36  | Validar rol usuario eliminado        | Usuario previamente eliminado               | UsuarioNoEncontradoError               | Extremo     |
 
 ---
 
-## 💰 **Módulo de Ventas**  
-| ID  | Descripción                          | Entrada                                     | Salida Esperada                          | Tipo        |
-|-----|--------------------------------------|---------------------------------------------|------------------------------------------|-------------|
-| 37  | Registrar venta simple               | Venta con 2 productos                       | Historial con 1 venta                    | Normal      |
-| 38  | Validar stock en venta               | cantidad=2                                | True                                   | Normal      |
-| 39  | Registrar múltiples ventas           | 3 ventas                                    | Historial con 3 registros                | Normal      |
-| 40  | Calcular total                       | precio=500, cantidad=2                    | Total=1000                               | Normal      |
-| 41  | Validar stock post-venta             | Venta de 2 unidades                         | Stock reducido                           | Normal      |
-| 42  | Generar historial                    | Venta registrada                            | Historial completo                       | Normal      |
-| 43  | Precio negativo                      | precio=-100                               | ProductoInvalidoError                  | Error       |
-| 44  | Stock negativo                       | cantidad=-5                               | ProductoInvalidoError                  | Error       |
-| 45  | Producto duplicado                   | Producto repetido                           | ProductoDuplicadoError                 | Error       |
-| 46  | Stock insuficiente                   | cantidad=100 (stock=10)                   | StockInsuficienteError                 | Error       |
-| 47  | Cantidad negativa en venta           | cantidad=-5                               | VentaInvalidaError                     | Error       |
-| 48  | Fecha inválida                       | fecha="32/13/25"                          | FechaInvalidaError                     | Error       |
-| 49  | Venta producto no registrado         | Producto inexistente                        | VentaProductoNoRegistradoError         | Extremo     |
-| 50  | Descuento >100%                      | descuento=150%                            | DescuentoInvalidoError                 | Extremo     |
-| 51  | Venta sin productos                  | Lista vacía                                 | VentaInvalidaError                     | Extremo     |
-| 52  | Total negativo                       | total=-50                                 | TotalInvalidoError                     | Extremo     |
-| 53  | Venta sin empleado                   | id_empleado=None                          | VentaSinEmpleadoError                  | Extremo     |
-| 54  | Categoría inválida                   | categoria="Fantasma"                      | CategoriaInvalidaError                 | Extremo     |
-___
+## 🖥️ Funcionalidades Principales
 
-
-___
-## 🧪 Casos de Prueba (54 Total)
-
-😀 **¡Todas las pruebas pasan correctamente!**
-
-### 🔧 **Módulo de Inventario** (18 Pruebas)
-| ID  | Descripción                          | Tipo        | Estado |
-|-----|--------------------------------------|-------------|--------|
-| 1   | Agregar producto                     | Normal      | ✅     |
-| 2   | Eliminar producto existente          | Normal      | ✅     |
-| 3   | Actualizar stock válido              | Normal      | ✅     |
-| 7   | Producto duplicado                   | Error       | ✅     |
-| 14  | Stock máximo excedido (1001)         | Extremo     | ✅     |
-| 18  | Precio negativo en venta             | Extremo     | ✅     |
-
-### 👤 **Módulo de Usuarios** (16 Pruebas)
-| ID  | Descripción                          | Tipo        | Estado |
-|-----|--------------------------------------|-------------|--------|
-| 19  | Crear usuario                        | Normal      | ✅     |
-| 25  | Usuario duplicado                    | Error       | ✅     |
-| 31  | Rol con emojis                       | Extremo     | ✅     |
-| 36  | Validar rol usuario eliminado        | Extremo     | ✅     |
-
-### 💰 **Módulo de Ventas** (20 Pruebas)
-| ID  | Descripción                          | Tipo        | Estado |
-|-----|--------------------------------------|-------------|--------|
-| 37  | Registrar venta simple               | Normal      | ✅     |
-| 46  | Stock insuficiente                   | Error       | ✅     |
-| 50  | Descuento >100%                      | Extremo     | ✅     |
-| 54  | Categoría inválida                   | Extremo     | ✅     |
+- **Gestión de Inventario**: Alta, baja, modificación y consulta de productos.
+- **Gestión de Ventas**: Registro de ventas, validación de stock, historial.
+- **Gestión de Usuarios**: Alta, baja, listado y autenticación con roles (admin/empleado).
+- **Interfaz Gráfica**: Navegación intuitiva, validación de roles, popups de error/éxito.
+- **Menú por Consola**: Acceso a todas las funcionalidades desde CLI.
+- **Pruebas Automatizadas**: 54 casos de prueba cubriendo todos los módulos.
 
 ---
 
-## ⚠️ Problemas Conocidos
+## 🧪 Casos de Prueba
 
-```markdown
-- No hay errores activos actualmente.  
-✅ Todas las pruebas superadas con éxito.
+### **Módulo de Inventario** (18 pruebas)
 
-- **Mejoras Pendientes:**  
-  ⚠️ Añadir paginación al historial de ventas  
-  ⚠️ Implementar búsqueda por categoría
-```
-## ▶️ Ejecutar Pruebas
+| ID  | Descripción                          | Entrada / Caso                             | Salida Esperada / Estado                 | Tipo        | Estado |
+|-----|--------------------------------------|--------------------------------------------|------------------------------------------|-------------|--------|
+| 1   | Agregar producto                     | Producto válido                            | Producto agregado                        | Normal      | ✅     |
+| 2   | Eliminar producto existente          | ID existente                               | Producto eliminado                       | Normal      | ✅     |
+| 3   | Actualizar stock válido              | Stock positivo                             | Stock actualizado                        | Normal      | ✅     |
+| 4   | Consultar producto                   | ID existente                               | Producto encontrado                      | Normal      | ✅     |
+| 5   | Listar productos                     | -                                          | Lista completa                           | Normal      | ✅     |
+| 6   | Actualizar precio                    | Precio válido                              | Precio actualizado                       | Normal      | ✅     |
+| 7   | Producto duplicado                   | ID repetido                                | Error ProductoDuplicado                  | Error       | ✅     |
+| 8   | Eliminar producto inexistente        | ID no existente                            | Error ProductoNoEncontrado               | Error       | ✅     |
+| 9   | Stock negativo                       | Stock < 0                                  | Error ProductoInvalido                   | Error       | ✅     |
+| 10  | Precio negativo                      | Precio < 0                                 | Error ProductoInvalido                   | Error       | ✅     |
+| 11  | Nombre vacío                         | Nombre = ""                                | Error ProductoInvalido                   | Error       | ✅     |
+| 12  | Stock máximo excedido                | Stock > 1000                               | Error StockExcedido                      | Extremo     | ✅     |
+| 13  | Nombre largo                         | Nombre > 100 caracteres                    | Error NombreProductoInvalido             | Extremo     | ✅     |
+| 14  | Producto con caracteres especiales   | Nombre con símbolos                        | Producto agregado                        | Extremo     | ✅     |
+| 15  | Consultar producto inexistente       | ID no existente                            | Error ProductoNoEncontrado               | Error       | ✅     |
+| 16  | Actualizar stock a cero              | Stock = 0                                  | Stock actualizado                        | Normal      | ✅     |
+| 17  | Eliminar todos los productos         | -                                          | Inventario vacío                         | Normal      | ✅     |
+| 18  | Precio negativo en venta             | Venta con precio negativo                  | Error VentaInvalida                      | Extremo     | ✅     |
+
+---
+
+### **Módulo de Usuarios** (16 pruebas)
+
+| ID  | Descripción                          | Entrada / Caso                             | Salida Esperada / Estado                 | Tipo        | Estado |
+|-----|--------------------------------------|--------------------------------------------|------------------------------------------|-------------|--------|
+| 19  | Crear usuario                        | Usuario válido                             | Usuario creado                           | Normal      | ✅     |
+| 20  | Validar rol                          | ID y rol válidos                           | True                                     | Normal      | ✅     |
+| 21  | Eliminar usuario                     | ID existente                               | Usuario eliminado                        | Normal      | ✅     |
+| 22  | Iniciar sesión exitoso               | Credenciales válidas                       | Login exitoso                            | Normal      | ✅     |
+| 23  | Cambiar contraseña                   | Contraseña válida                          | Contraseña actualizada                   | Normal      | ✅     |
+| 24  | Iniciar sesión fallido               | Contraseña incorrecta                      | Error CredencialesInvalidas              | Error       | ✅     |
+| 25  | Usuario duplicado                    | ID repetido                                | Error UsuarioDuplicado                   | Error       | ✅     |
+| 26  | Validar rol inexistente              | ID no existente                            | Error UsuarioNoEncontrado                | Error       | ✅     |
+| 27  | Eliminar usuario inexistente         | ID no existente                            | Error UsuarioNoEncontrado                | Error       | ✅     |
+| 28  | Contraseña vacía                     | Contraseña = ""                            | Error ContraseñaInvalida                 | Error       | ✅     |
+| 29  | Credenciales inválidas               | Contraseña incorrecta                      | Error CredencialesInvalidas              | Error       | ✅     |
+| 30  | Cambio a contraseña inválida         | Contraseña = ""                            | Error ContraseñaInvalida                 | Error       | ✅     |
+| 31  | Rol con emojis                       | Rol = "admin🔥"                            | Error RolInvalido                        | Extremo     | ✅     |
+| 32  | Nombre de 100 caracteres             | Nombre largo                               | Error NombreUsuarioInvalido              | Extremo     | ✅     |
+| 33  | Contraseña expirada                  | Fecha expirada                             | Error ContraseñaExpirada                 | Extremo     | ✅     |
+| 34  | Rol inexistente                      | Rol = "superheroe"                         | Error RolInvalido                        | Extremo     | ✅     |
+| 35  | Nombre usuario vacío                 | Nombre = ""                                | Error NombreUsuarioInvalido              | Extremo     | ✅     |
+| 36  | Validar rol usuario eliminado        | Usuario eliminado                          | Error UsuarioNoEncontrado                | Extremo     | ✅     |
+
+---
+
+### **Módulo de Ventas** (20 pruebas)
+
+| ID  | Descripción                          | Entrada / Caso                             | Salida Esperada / Estado                 | Tipo        | Estado |
+|-----|--------------------------------------|--------------------------------------------|------------------------------------------|-------------|--------|
+| 37  | Registrar venta simple               | Venta con 2 productos                      | Venta registrada                         | Normal      | ✅     |
+| 38  | Validar stock en venta               | Stock suficiente                           | True                                     | Normal      | ✅     |
+| 39  | Registrar múltiples ventas           | 3 ventas                                   | 3 ventas registradas                     | Normal      | ✅     |
+| 40  | Calcular total                       | Precio y cantidad                          | Total correcto                           | Normal      | ✅     |
+| 41  | Validar stock post-venta             | Venta realizada                            | Stock reducido                           | Normal      | ✅     |
+| 42  | Generar historial                    | Ventas registradas                         | Historial completo                       | Normal      | ✅     |
+| 43  | Precio negativo                      | Precio < 0                                 | Error ProductoInvalido                   | Error       | ✅     |
+| 44  | Stock negativo                       | Stock < 0                                  | Error ProductoInvalido                   | Error       | ✅     |
+| 45  | Producto duplicado                   | Producto repetido en venta                 | Error ProductoDuplicado                  | Error       | ✅     |
+| 46  | Stock insuficiente                   | Stock < cantidad solicitada                | Error StockInsuficiente                  | Error       | ✅     |
+| 47  | Cantidad negativa en venta           | Cantidad < 0                               | Error VentaInvalida                      | Error       | ✅     |
+| 48  | Fecha inválida                       | Fecha malformada                           | Error FechaInvalida                      | Error       | ✅     |
+| 49  | Venta producto no registrado         | Producto no existe                         | Error VentaProductoNoRegistrado          | Extremo     | ✅     |
+| 50  | Descuento >100%                      | Descuento = 150%                           | Error DescuentoInvalido                  | Extremo     | ✅     |
+| 51  | Venta sin productos                  | Lista vacía                                | Error VentaInvalida                      | Extremo     | ✅     |
+| 52  | Total negativo                       | Total < 0                                  | Error TotalInvalido                      | Extremo     | ✅     |
+| 53  | Venta sin empleado                   | id_empleado = None                         | Error VentaSinEmpleado                   | Extremo     | ✅     |
+| 54  | Categoría inválida                   | Categoría no registrada                    | Error CategoriaInvalida                  | Extremo     | ✅     |
+
+---
+
+## 🗃️ Modelo Relacional
+
+El modelo relacional está alineado con el script DDL (`database.sql`) y representado en notación Barker (PlantUML):
+
+![Diagrama ER](modelo_relacional.png)
+
+> El archivo fuente editable está en `modelo_relacional.puml`.
+
+---
+
+## 🗄️ Integración de Base de Datos
+
+El sistema utiliza **SQLite** como motor de base de datos, gestionado mediante un ORM propio.
+Las tablas y relaciones están definidas en el script [`database.sql`](database.sql), y el modelo relacional está alineado con la implementación.
+
+- **Creación de tablas:**
+  El script DDL (`database.sql`) crea todas las tablas necesarias (`usuarios`, `productos`, `ventas`, `detalle_ventas`) y define las claves primarias y foráneas.
+
+- **Consultas y operaciones:**
+  Todas las operaciones CRUD y consultas complejas se realizan a través de clases ORM en `src/database/`.
+
+---
+
+## 🗺️ Diagrama Entidad-Relación
+
+El modelo relacional se representa en notación Barker (PlantUML):
+
+![Diagrama ER](modelo_relacional.png)
+
+- El archivo fuente editable está en [`modelo_relacional.puml`](modelo_relacional.puml).
+
+---
+
+## ▶️ Ejecución de Pruebas
 
 ```bash
-# Ejecutar todas las pruebas
-pytest tests/ -v --cov=src
-pytest tests/
-# Ejecutar pruebas específicas
-pytest tests/test_tienda.py -k "test_stock_insuficiente"
+# 1. Activar el entorno virtual
+# En Windows:
+.venv\Scripts\activate
 
-# Generar reporte HTML de cobertura
+# 2. Ejecutar todas las pruebas
+
+
+pytest tests/
+
+# 3. Ejecutar pruebas específicas
+pytest tests/test_usuarios.py -k "test_usuario_duplicado"
+
+# 4. Generar reporte HTML de cobertura
 pytest --cov=src --cov-report=html
 ```
-> ⚠️ **Advertencia**: Al ejecutar los tests, los archivos JSON del sistema (`ventas.json`, `inventario.json`, `usuarios.json`) se eliminan y el proyecto se reinicia a su estado por defecto. Usa una copia de respaldo si necesitas conservar datos reales.
+> ⚠️ **Advertencia**: Al ejecutar los tests, los archivos de datos se reinician. Haz copia de seguridad si tienes datos reales.
 
+---
+
+## 🚩 Estado del Proyecto
+
+- Todas las funcionalidades implementadas y probadas.
+- Interfaz gráfica y menú por consola completamente funcionales.
+- Estructura modular siguiendo el patrón Modelo-Vista-Controlador (MVC).
+- Sin errores activos conocidos.
+
+## 📊 Diagramas del Sistema
+
+- **Diagrama de Clases:**
+
+  ![Diagrama de Clases](img/Diagrama.drawio.png)
+
+- **Diagrama DDL:**
+
+  ![Diagrama DDL](img/DDL.png)
+
+---

@@ -30,7 +30,7 @@
                 viewclass: 'HistorialVentaItemCustom'
 
                 RecycleBoxLayout:
-                    default_size: None, dp(80)
+                    default_size: None, dp(120)  # Aumentado para dar más espacio
                     default_size_hint: 1, None
                     size_hint_y: None
                     height: self.minimum_height
@@ -38,34 +38,58 @@
                     spacing: dp(10)
                     padding: dp(10)
 
-        Button:
-            text: 'Volver'
-            background_color: 0.2, 0.2, 0.2, 1
-            color: 1, 1, 1, 1
-            font_size: dp(18)
+        BoxLayout:
             size_hint_y: None
             height: dp(50)
-            on_press: root.manager.current = 'main'
+            spacing: dp(10)
+
+            Button:
+                text: 'Borrar Historial'
+                background_color: 1, 0.2, 0.2, 1
+                color: 1, 1, 1, 1
+                font_size: dp(18)
+                on_press: root.borrar_historial()
+
+            Button:
+                text: 'Volver'
+                background_color: 0.2, 0.2, 0.2, 1
+                color: 1, 1, 1, 1
+                font_size: dp(18)
+                on_press: root.manager.current = 'main'
 
 <HistorialVentaItemCustom@BoxLayout>:
     orientation: 'vertical'
     size_hint_y: None
-    height: self.minimum_height
-    padding: dp(10)
-    spacing: dp(5)
+    height: self.minimum_height + dp(30)  # Más espacio entre ventas
+    padding: dp(24), dp(16)  # Más margen lateral y vertical
+    spacing: dp(8)
     canvas.before:
         Color:
             rgba: 1, 1, 1, 1
         Rectangle:
             pos: self.pos
             size: self.size
+    # Separador visual inferior
+    canvas.after:
+        Color:
+            rgba: 0.7, 0.7, 0.7, 1  # Color más suave
+        Rectangle:
+            pos: self.x, self.y
+            size: self.width, dp(4)  # Separador más grueso
 
-    Label:
-        text: root.texto_venta
-        markup: True
-        color: 0, 0, 0, 1  # Texto negro
-        halign: 'left'
-        valign: 'top'
-        text_size: self.width, None
+    BoxLayout:
+        orientation: 'vertical'
         size_hint_y: None
-        height: self.texture_size[1] + dp(20)
+        height: self.minimum_height
+        spacing: dp(5)
+
+        Label:
+            text: root.texto_venta
+            markup: True
+            color: 0, 0, 0, 1  # Texto negro
+            halign: 'left'
+            valign: 'top'
+            text_size: self.width - dp(20), None  # Reducir el ancho para dar margen
+            size_hint_y: None
+            height: self.texture_size[1] + dp(20)
+            padding: dp(10), dp(5)

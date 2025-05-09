@@ -29,6 +29,7 @@
                 size_hint_y: None
                 height: dp(50)
                 on_press:
+                    app.root.get_screen('login').destino = 'productos_menu'
                     root.manager.current = 'login'
                     root.manager.transition.direction = 'left'
 
@@ -38,7 +39,8 @@
                 size_hint_y: None
                 height: dp(50)
                 on_press:
-                    root.manager.current = 'usuarios_menu'
+                    app.root.get_screen('login').destino = 'usuarios_menu'
+                    root.manager.current = 'login'
                     root.manager.transition.direction = 'left'
 
             Button:

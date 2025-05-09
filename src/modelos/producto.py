@@ -56,7 +56,7 @@ class Producto:
         self.nombre = nombre
         self.precio = precio
         self.cantidad = cantidad
-        self.categoria = categoria
+        self.categoria = categoria.lower()  # Normalizar categoría a minúsculas
         self.stock_minimo = stock_minimo
 
     def actualizar_stock(self, cantidad: int):

@@ -19,11 +19,7 @@ from src.modelos.producto import Producto
 class ProductosMenuScreen(Screen):
     """
     Pantalla principal para navegar por las operaciones de productos.
-
-    Attributes:
-        console_ui (ObjectProperty): Conexión con la interfaz principal
     """
-    console_ui = ObjectProperty(None)
 
     def mostrar_submenu(self, opcion):
         """
@@ -47,10 +43,8 @@ class AgregarProductoScreen(Screen):
 
     Attributes:
         inventario (ObjectProperty): Conexión al módulo de inventario
-        console_ui (ObjectProperty): Enlace a la interfaz principal
     """
     inventario = ObjectProperty(None)
-    console_ui = ObjectProperty(None)
 
     def agregar_producto(self):
         """Valida y registra un nuevo producto con los datos del formulario."""
@@ -67,7 +61,6 @@ class AgregarProductoScreen(Screen):
                 int(self.ids.stock_minimo.text)
             )
             self.inventario.agregar_producto(nuevo)
-            self.console_ui._guardar_inventario()
             self.mostrar_popup("✅ Éxito", "Producto agregado correctamente!")
             self.resetear_campos()
             self.manager.current = 'productos_menu'
@@ -97,17 +90,29 @@ class EliminarProductoScreen(Screen):
 
     Attributes:
         inventario (ObjectProperty): Conexión al módulo de inventario
-        console_ui (ObjectProperty): Enlace a la interfaz principal
     """
     inventario = ObjectProperty(None)
-    console_ui = ObjectProperty(None)
+
+    def on_pre_enter(self):
+        """Carga la lista de productos al entrar en la pantalla."""
+        productos = self.inventario.db.get_all_products()
+        self.ids.lista_productos_eliminar.data = [
+            {
+                'texto_producto': f"🆔 {p['id']} | {p['nombre'][:25] + '...' if len(p['nombre']) > 25 else p['nombre']}",
+                'id_producto': p['id']
+            }
+            for p in productos
+        ]
+
+    def seleccionar_producto(self, id_producto):
+        """Rellena el campo de ID con el producto seleccionado."""
+        self.ids.id_eliminar.text = str(id_producto)
 
     def eliminar_producto(self):
         """Elimina un producto del sistema mediante su ID."""
         try:
             producto_id = int(self.ids.id_eliminar.text)
             resultado = self.inventario.eliminar_producto(producto_id)
-            self.console_ui._guardar_inventario()
             self.mostrar_popup("✅ Éxito", resultado)
             self.ids.id_eliminar.text = ""
             self.manager.current = 'productos_menu'
@@ -131,24 +136,69 @@ class ActualizarStockScreen(Screen):
 
     Attributes:
         inventario (ObjectProperty): Conexión al módulo de inventario
-        console_ui (ObjectProperty): Enlace a la interfaz principal
     """
     inventario = ObjectProperty(None)
-    console_ui = ObjectProperty(None)
+
+    def on_pre_enter(self):
+        """Carga la lista de productos al entrar en la pantalla."""
+        self.cargar_productos()
+
+    def cargar_productos(self):
+        """Carga la lista de productos en el RecycleView"""
+        try:
+            # Obtener la lista de productos
+            productos = self.inventario.db.get_all_products()
+            
+            # Crear la lista de datos para el RecycleView
+            data = []
+            for producto in productos:
+                data.append({
+                    'texto_producto': f"{producto['id']} - {producto['nombre']} (Stock: {producto['cantidad']})",
+                    'id_producto': producto['id']
+                })
+            
+            # Actualizar el RecycleView
+            self.ids.lista_productos_actualizar.data = data
+        except Exception as e:
+            print(f"Error al cargar productos: {str(e)}")
+
+    def seleccionar_producto(self, id_producto):
+        """Maneja la selección de un producto de la lista"""
+        self.ids.id_producto.text = str(id_producto)
+        # Obtener el stock actual del producto
+        try:
+            producto = self.inventario.db.get_product(id_producto)
+            if producto:
+                self.ids.nueva_cantidad.text = str(producto['cantidad'])
+        except Exception as e:
+            print(f"Error al obtener producto: {str(e)}")
 
     def actualizar_stock(self):
-        """Actualiza la cantidad disponible de un producto en el inventario."""
+        """Actualiza el stock del producto seleccionado"""
         try:
-            producto_id = int(self.ids.id_producto.text.strip())
-            nueva_cantidad = int(self.ids.nueva_cantidad.text.strip())
-            resultado = self.inventario.actualizar_stock(producto_id, nueva_cantidad)
-            self.console_ui._guardar_inventario()
-            self.mostrar_popup("✅ Éxito", resultado)
-            self.ids.id_producto.text = ""
-            self.ids.nueva_cantidad.text = ""
-            self.manager.current = 'productos_menu'
-        except Exception as e:
+            id_producto = int(self.ids.id_producto.text)
+            nueva_cantidad = int(self.ids.nueva_cantidad.text)
+            
+            if nueva_cantidad < 0:
+                raise ValueError("La cantidad no puede ser negativa")
+            
+            # Actualizar el stock
+            self.inventario.actualizar_stock(id_producto, nueva_cantidad)
+            
+            # Mostrar mensaje de éxito
+            self.mostrar_popup("✅ Éxito", f"Stock actualizado exitosamente para el producto {id_producto}")
+            
+            # Limpiar campos
+            self.ids.id_producto.text = ''
+            self.ids.nueva_cantidad.text = ''
+            
+            # Recargar la lista de productos
+            self.cargar_productos()
+            
+        except ValueError as e:
             self.mostrar_popup("❌ Error", str(e))
+        except Exception as e:
+            self.mostrar_popup("❌ Error", f"Error al actualizar stock: {str(e)}")
 
     def mostrar_popup(self, titulo, mensaje):
         """
@@ -172,12 +222,13 @@ class VerInventarioScreen(Screen):
 
     def on_pre_enter(self):
         """Prepara los datos del inventario antes de mostrar la pantalla."""
+        productos = self.inventario.db.get_all_products()
         self.ids.lista_productos.data = [{
-            'texto_inventario': f"""[b]🆔 ID:[/b] {p.id}
-            [b]📦 Producto:[/b] {p.nombre[:20] + "..." if len(p.nombre) > 20 else p.nombre}
-            [b]💲 Precio:[/b] ${p.precio:.2f}
-            [b]📥 Stock:[/b] {p.cantidad} unidades
-            [b]🚨 Mínimo requerido:[/b] {p.stock_minimo}
-            [b]📂 Categoría:[/b] {p.categoria[:10] + "..." if len(p.categoria) > 10 else p.categoria}
+            'texto_inventario': f"""[b]🆔 ID:[/b] {p['id']}
+            [b]📦 Producto:[/b] {p['nombre'][:20] + '...' if len(p['nombre']) > 20 else p['nombre']}
+            [b]💲 Precio:[/b] {int(p['precio']):,}
+            [b]📥 Stock:[/b] {p['cantidad']} unidades
+            [b]🚨 Mínimo requerido:[/b] {p['stock_minimo']}
+            [b]📂 Categoría:[/b] {p['categoria'][:10] + '...' if len(p['categoria']) > 10 else p['categoria']}
             ───────────────────────────"""
-        } for p in self.inventario.productos]
+        } for p in productos]

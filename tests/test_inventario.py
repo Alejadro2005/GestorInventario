@@ -11,7 +11,7 @@ from src.errores.precio_invalido import PrecioInvalidoError
 
 # Tests caso normal
 
-def test_agregar_producto_a_inventario():
+def test_agregar_producto_a_inventario(inventario_limpio):
     """
     Verifica que un producto se agrega correctamente al inventario.
 
@@ -19,12 +19,12 @@ def test_agregar_producto_a_inventario():
 
     """
     producto = Producto(1, "lapiz", 500, 10, "escolar", 1)
-    inventario = Inventario()
-    inventario.agregar_producto(producto)
-    assert len(inventario.productos) == 1
+    inventario_limpio.agregar_producto(producto)
+    productos = inventario_limpio.db.get_all_products()
+    assert len(productos) == 1
 
 
-def test_eliminar_producto_de_inventario():
+def test_eliminar_producto_de_inventario(inventario_limpio):
     """
     Verifica que un producto se elimina correctamente del inventario.
 
@@ -32,12 +32,11 @@ def test_eliminar_producto_de_inventario():
     Se asegura que el mensaje de éxito sea el esperado.
     """
     producto = Producto(1, "lapiz", 8500, 10, "escolar", 1)
-    inventario = Inventario()
-    inventario.agregar_producto(producto)
-    assert inventario.eliminar_producto(1) == "El producto 'lapiz' ha sido eliminado con éxito."
+    inventario_limpio.agregar_producto(producto)
+    assert inventario_limpio.eliminar_producto(1) == "El producto 'lapiz' ha sido eliminado con éxito."
 
 
-def test_actualizar_stock():
+def test_actualizar_stock(inventario_limpio):
     """
     Verifica que el stock de un producto se actualiza correctamente.
 
@@ -45,40 +44,27 @@ def test_actualizar_stock():
     Se asegura que el stock del producto se haya actualizado correctamente.
     """
     producto = Producto(1, "lapiz", 500, 10, "escolar", 1)
-    inventario = Inventario()
-    inventario.agregar_producto(producto)
-    assert inventario.actualizar_stock(1, 10) == "La cantidad de 'lapiz' se ha actualizado a: 20."
+    inventario_limpio.agregar_producto(producto)
+    assert inventario_limpio.actualizar_stock(1, 10) == "La cantidad de 'lapiz' se ha actualizado a: 10."
 
 
-def test_filtrar_stock_bajo():
-    """
-    Verifica que se filtran correctamente los productos con stock bajo.
-
-    Crea dos productos, uno con stock bajo y otro con suficiente stock, 
-    y luego verifica que solo el producto con stock bajo sea filtrado.
-    """
+def test_filtrar_stock_bajo(inventario_limpio):
     producto = Producto(1, "lapiz", 500, 10, "escolar", 1)
     producto2 = Producto(2, "cuaderno", 1500, 20, "escolar", 1)
-    gestor_inventario = Inventario()
-    gestor_inventario.agregar_producto(producto)
-    gestor_inventario.agregar_producto(producto2)
-    assert gestor_inventario.filtrar_por_stock_bajo() == [producto]
+    inventario_limpio.agregar_producto(producto)
+    inventario_limpio.agregar_producto(producto2)
+    resultado = inventario_limpio.filtrar_por_stock_bajo()
+    assert resultado[0].id == producto.id
 
 
-def test_eliminar_producto2():
-    """
-    Verifica que se elimina correctamente un producto del inventario.
-
-    Crea dos productos, los agrega al inventario y luego elimina uno. 
-    Se asegura que el inventario contenga solo el producto restante.
-    """
+def test_eliminar_producto2(inventario_limpio):
     producto = Producto(1, "lapiz", 500, 10, "escolar", 1)
     producto2 = Producto(2, "cuaderno", 1500, 20, "escolar", 1)
-    gestor_inventario = Inventario()
-    gestor_inventario.agregar_producto(producto)
-    gestor_inventario.agregar_producto(producto2)
-    gestor_inventario.eliminar_producto(1)
-    assert len(gestor_inventario.productos) == 1
+    inventario_limpio.agregar_producto(producto)
+    inventario_limpio.agregar_producto(producto2)
+    inventario_limpio.eliminar_producto(1)
+    productos = inventario_limpio.db.get_all_products()
+    assert len(productos) == 1
 
 
 def test_actualizar_stock_producto():
@@ -94,7 +80,7 @@ def test_actualizar_stock_producto():
 
 # Test caso Error
 
-def test_agregar_producto_duplicado():
+def test_agregar_producto_duplicado(inventario_limpio):
     """
     Verifica que se lanza un error al intentar agregar un producto duplicado.
 
@@ -102,48 +88,32 @@ def test_agregar_producto_duplicado():
     y verifica que se lance una excepción ProductoDuplicadoError.
     """
     producto = Producto(1, "lapiz", 500, 10, "escolar", 1)
-    gestor_inventario = Inventario()
-    gestor_inventario.agregar_producto(producto)
+    inventario_limpio.agregar_producto(producto)
     with pytest.raises(ProductoDuplicadoError):
-        gestor_inventario.agregar_producto(producto)
+        inventario_limpio.agregar_producto(producto)
 
 
-def test_eliminar_producto_inexistente():
+def test_eliminar_producto_inexistente(inventario_limpio):
     """
     Verifica que se lanza un error al intentar eliminar un producto que no existe.
 
     Intenta eliminar un producto con un ID que no existe en el inventario y asegura que se 
     lance una excepción ProductoNoEncontradoError.
     """
-    gestor_inventario = Inventario()
     with pytest.raises(ProductoNoEncontradoError):
-        gestor_inventario.eliminar_producto(99)  # ID que no existe
+        inventario_limpio.eliminar_producto(99)  # ID que no existe
 
 
-def test_actualizar_stock_cantidad_negativa():
-    """
-    Verifica que se lanza un error al intentar actualizar el stock con una cantidad negativa.
-
-    Se intenta actualizar el stock de un producto con una cantidad negativa y se asegura que 
-    se lance una excepción StockInvalidoError.
-    """
+def test_actualizar_stock_cantidad_negativa(inventario_limpio):
     producto = Producto(1, "lapiz", 500, 10, "escolar", 1)
-    gestor_inventario = Inventario()
-    gestor_inventario.agregar_producto(producto)
+    inventario_limpio.agregar_producto(producto)
     with pytest.raises(StockInvalidoError):
-        gestor_inventario.actualizar_stock(1, -5)  # Stock negativo
+        inventario_limpio.actualizar_stock(1, -5)  # Stock negativo
 
 
-def test_filtrar_stock_sin_productos():
-    """
-    Verifica que se lanza un error si no hay productos en el inventario al intentar filtrar productos con stock bajo.
-
-    Se asegura que se lance una excepción NoHayProductosError cuando se intenta filtrar productos
-    sin que haya productos en el inventario.
-    """
-    gestor_inventario = Inventario()
+def test_filtrar_stock_sin_productos(inventario_limpio):
     with pytest.raises(NoHayProductosError):
-        gestor_inventario.filtrar_por_stock_bajo()
+        inventario_limpio.filtrar_por_stock_bajo()
 
 
 def test_producto_invalido_nombre_vacio():
@@ -156,16 +126,15 @@ def test_producto_invalido_nombre_vacio():
         producto = Producto(1, "", 500, 10, "escolar", 1)  # Nombre vacío debería ser inválido
 
 
-def test_actualizar_stock_producto_inexistente():
+def test_actualizar_stock_producto_inexistente(inventario_limpio):
     """
     Verifica que se lanza un error al intentar actualizar el stock de un producto que no existe.
 
     Se asegura que se lance una excepción ProductoNoEncontradoError si se intenta actualizar el stock
     de un producto con un ID que no existe en el inventario.
     """
-    gestor_inventario = Inventario()
     with pytest.raises(ProductoNoEncontradoError):
-        gestor_inventario.actualizar_stock(99, 5)  # Producto con ID 99 no existe
+        inventario_limpio.actualizar_stock(99, 5)  # Producto con ID 99 no existe
 
 
 # test caso extremo

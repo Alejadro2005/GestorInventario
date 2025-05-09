@@ -27,9 +27,11 @@ class VentasScreen(Screen):
 
     def cargar_productos_disponibles(self):
         """Actualiza la lista de productos mostrada con stock actual y estados"""
+        productos = self.inventario.db.get_all_products()
         self.ids.lista_productos.data = [{
-            'text': f"{p.nombre} (ID: {p.id}) - ${p.precio:.2f}" + (" [Agotado]" if p.cantidad == 0 else "")
-        } for p in self.inventario.productos]
+            'texto_producto': f"{p['nombre']} (ID: {p['id']}) - {int(p['precio']):,} - Stock: {p['cantidad']}" + (" [Agotado]" if p['cantidad'] == 0 else ""),
+            'id_producto': p['id']
+        } for p in productos]
 
     def agregar_producto_venta(self):
         """
@@ -37,22 +39,31 @@ class VentasScreen(Screen):
         Realiza validaciones de stock, cantidad y duplicados.
         """
         try:
+            # Validar campos vacíos
+            if not self.ids.id_producto.text or not self.ids.cantidad.text:
+                raise ValueError("Debe ingresar ID y cantidad del producto")
+
             # Obtener y validar datos de entrada
             producto_id = int(self.ids.id_producto.text)
             cantidad = int(self.ids.cantidad.text)
             if cantidad <= 0:
                 raise ValueError("La cantidad debe ser mayor a 0")
 
-            # Buscar producto en el inventario
-            producto = next(p for p in self.inventario.productos if p.id == producto_id)
+            # Buscar producto en la base de datos
+            producto = self.inventario.db.get_product(producto_id)
+            if not producto:
+                raise ValueError(f"No se encontró un producto con ID {producto_id}")
 
             # Validar disponibilidad
-            if producto.cantidad == 0:
-                raise ValueError(f"{producto.nombre} está agotado")
-            if cantidad > producto.cantidad:
-                raise ValueError(f"Solo hay {producto.cantidad} unidades de {producto.nombre}")
-            if any(p.id == producto.id for p, _ in self.productos_seleccionados):
-                raise ValueError(f"{producto.nombre} ya fue agregado")
+            if producto['cantidad'] == 0:
+                raise ValueError(f"{producto['nombre']} está agotado")
+            if cantidad > producto['cantidad']:
+                raise ValueError(f"Solo hay {producto['cantidad']} unidades de {producto['nombre']}")
+            
+            # Verificar si el producto ya está en la lista
+            for p, _ in self.productos_seleccionados:
+                if p['id'] == producto['id']:
+                    raise ValueError(f"{producto['nombre']} ya fue agregado")
 
             # Agregar a la lista temporal de venta
             self.productos_seleccionados.append((producto, cantidad))
@@ -61,9 +72,11 @@ class VentasScreen(Screen):
             # Limpiar campos y mostrar confirmación
             self.ids.id_producto.text = ""
             self.ids.cantidad.text = ""
-            self.mostrar_popup("✅ Añadido", f"{producto.nombre} x{cantidad}")
-        except Exception as e:
+            self.mostrar_popup("✅ Añadido", f"{producto['nombre']} x{cantidad}")
+        except ValueError as e:
             self.mostrar_popup("❌ Error", str(e))
+        except Exception as e:
+            self.mostrar_popup("❌ Error", "Error inesperado al agregar el producto")
 
     def procesar_venta(self):
         """
@@ -71,7 +84,13 @@ class VentasScreen(Screen):
         Valida empleado, fecha y productos seleccionados.
         Actualiza inventario y guarda cambios.
         """
+        import traceback
         try:
+            # Validar campos obligatorios
+            if not self.ids.id_empleado.text:
+                raise ValueError("Debe ingresar el ID del empleado")
+            if not self.ids.fecha_venta.text:
+                raise ValueError("Debe ingresar la fecha de la venta")
             if not self.productos_seleccionados:
                 raise ValueError("Debe seleccionar al menos un producto")
 
@@ -83,23 +102,44 @@ class VentasScreen(Screen):
             if usuario.rol != "empleado":
                 raise ValueError("Solo empleados pueden registrar ventas")
 
+            # Validar stock antes de procesar la venta
+            for producto, cantidad in self.productos_seleccionados:
+                producto_actual = self.inventario.db.get_product(producto['id'])
+                if not producto_actual:
+                    raise ValueError(f"El producto {producto['nombre']} ya no existe en el inventario")
+                if producto_actual['cantidad'] < cantidad:
+                    raise ValueError(f"Stock insuficiente para {producto['nombre']}. Disponible: {producto_actual['cantidad']}, requerido: {cantidad}")
+
+            # Calcular el nuevo ID de venta usando la base de datos
+            nuevo_id = len(self.tienda.db.get_all_sales()) + 1
+
             # Crear y registrar la venta
             venta = Venta(
-                len(self.tienda.historial_ventas) + 1,
+                nuevo_id,
                 fecha,
                 self.productos_seleccionados,
                 id_empleado,
                 self.inventario
             )
 
+            # Registrar la venta y actualizar el stock
             resultado = self.tienda.registrar_venta(venta, self.inventario)
-            self.console_ui._guardar_inventario()  # Persistir cambios
+            
+            # Verificar que el stock se actualizó correctamente
+            for producto, cantidad in self.productos_seleccionados:
+                producto_actual = self.inventario.db.get_product(producto['id'])
+                if producto_actual['cantidad'] != producto['cantidad'] - cantidad:
+                    raise ValueError(f"Error al actualizar el stock de {producto['nombre']}")
 
-            self.mostrar_popup("✅ Éxito", resultado)
+            self.mostrar_popup("Éxito", resultado)
             self.resetear_campos()
             self.manager.current = 'main'
+        except ValueError as e:
+            self.mostrar_popup("Error", str(e))
         except Exception as e:
-            self.mostrar_popup("❌ Error", str(e))
+            import traceback
+            traceback.print_exc()
+            self.mostrar_popup("Error", f"{type(e).__name__}: {e}")
 
     def validar_fecha(self, fecha_str):
         """
@@ -136,8 +176,15 @@ class VentasScreen(Screen):
 
     def actualizar_lista_seleccionados(self):
         """Actualiza la interfaz con los productos seleccionados"""
-        self.ids.productos_seleccionados.data = [{'text': f"{p.nombre} x{cantidad}"}
+        self.ids.productos_seleccionados.data = [{'text': f"{p['nombre']} x{cantidad}"}
                                                  for p, cantidad in self.productos_seleccionados]
+        
+        # Actualizar resumen de la venta
+        if self.productos_seleccionados:
+            total = sum(p['precio'] * cantidad for p, cantidad in self.productos_seleccionados)
+            self.ids.resumen_venta.text = f"Total de la venta: {int(total):,}"
+        else:
+            self.ids.resumen_venta.text = ""
 
     def mostrar_popup(self, titulo, mensaje):
         """
@@ -148,3 +195,7 @@ class VentasScreen(Screen):
             mensaje (str): Contenido del mensaje
         """
         Popup(title=titulo, content=Label(text=mensaje, color=(0, 0, 0, 1)), size_hint=(0.6, 0.4)).open()
+
+    def seleccionar_producto(self, id_producto):
+        """Rellena el campo de ID de producto con el seleccionado."""
+        self.ids.id_producto.text = str(id_producto)
