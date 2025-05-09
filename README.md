@@ -183,7 +183,7 @@ pytest tests/test_usuarios.py -k "test_usuario_duplicado"
 # 4. Generar reporte HTML de cobertura
 pytest --cov=src --cov-report=html
 ```
-> ⚠️ **Advertencia**: Al ejecutar los tests, los archivos de datos se reinician. Haz copia de seguridad si tienes datos reales.
+
 
 ---
 
@@ -197,11 +197,9 @@ pytest --cov=src --cov-report=html
 ## 📊 Diagramas del Sistema
 
 - **Diagrama de Clases:**
-
-  ![Diagrama de Clases](img/Diagrama.drawio.png)
+![Diagrama.drawio.png](Img/Diagrama.drawio.png)
 
 - **Diagrama DDL:**
-
-  ![Diagrama DDL](img/DDL.png)
-
+![DDL.png](Img/DDL.png)
+  
 ---
