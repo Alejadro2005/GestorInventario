@@ -196,6 +196,8 @@ pytest --cov=src --cov-report=html
 ![Diagrama.drawio.png](Img/Diagrama.drawio.png)
 
 - **Diagrama DDL:**
+
+
 ![DDL.png](Img/DDL.png)
   
 ---
