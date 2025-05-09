@@ -159,10 +159,6 @@ Las tablas y relaciones están definidas en el script [`database.sql`](database.
 
 El modelo relacional se representa en notación Barker (PlantUML):
 
-![Diagrama ER](modelo_relacional.png)
-
-- El archivo fuente editable está en [`modelo_relacional.puml`](modelo_relacional.puml).
-
 ---
 
 ## ▶️ Ejecución de Pruebas
