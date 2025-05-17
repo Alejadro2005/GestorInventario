@@ -1,0 +1,53 @@
+#:import dp kivy.metrics.dp
+
+<EliminarUsuarioScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(15)
+        canvas.before:
+            Color:
+                rgba: 0.95, 0.95, 0.95, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: '[b]ELIMINAR USUARIO[/b]'
+            markup: True
+            font_size: dp(24)
+            color: 0.1, 0.4, 0.8, 1
+            size_hint_y: None
+            height: dp(40)
+
+        GridLayout:
+            cols: 2
+            spacing: dp(10)
+            size_hint_y: None
+            height: self.minimum_height
+            row_default_height: dp(40)
+
+            Label:
+                text: '[b]ID del Usuario:[/b]'
+                markup: True
+                color: 0.2, 0.2, 0.2, 1
+            TextInput:
+                id: id_eliminar
+                hint_text: "Ej: 2001"
+                input_filter: 'int'
+                background_color: 1, 1, 1, 1
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            spacing: dp(10)
+
+            Button:
+                text: 'ELIMINAR'
+                background_color: 0.8, 0.1, 0.1, 1
+                on_press: root.eliminar_usuario()
+
+            Button:
+                text: 'CANCELAR'
+                background_color: 0.6, 0.6, 0.6, 1
+                on_press: root.manager.current = 'usuarios_menu'

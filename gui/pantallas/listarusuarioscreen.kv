@@ -1,0 +1,66 @@
+#:import dp kivy.metrics.dp
+
+<ListarUsuariosScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(15)
+        canvas.before:
+            Color:
+                rgba: 0.95, 0.95, 0.95, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: '[b]USUARIOS REGISTRADOS[/b]'
+            markup: True
+            font_size: dp(24)
+            color: 0.1, 0.4, 0.8, 1
+            size_hint_y: None
+            height: dp(40)
+
+        ScrollView:
+            bar_width: dp(10)
+            bar_color: 0.1, 0.4, 0.8, 1
+            RecycleView:
+                id: lista_usuarios
+                viewclass: 'UsuarioItemLista'
+                RecycleBoxLayout:
+                    default_size: None, None
+                    default_size_hint: 1, None
+                    size_hint_y: None
+                    height: self.minimum_height
+                    orientation: 'vertical'
+                    spacing: dp(5)
+
+        Button:
+            text: 'Volver'
+            background_color: 0.6, 0.6, 0.6, 1
+            size_hint_y: None
+            height: dp(50)
+            on_press: root.manager.current = 'usuarios_menu'
+
+<UsuarioItemLista@BoxLayout>:
+    texto: ""
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: self.minimum_height
+    padding: dp(10)
+    spacing: dp(20)
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Label:
+        text: root.texto
+        font_size: '16sp'
+        color: 0.1, 0.1, 0.1, 1
+        halign: 'left'
+        valign: 'middle'
+        size_hint_x: 1
+        text_size: self.width, None
+        height: self.texture_size[1]

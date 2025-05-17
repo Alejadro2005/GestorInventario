@@ -1,0 +1,71 @@
+#:import dp kivy.metrics.dp
+
+<VerInventarioScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(15)
+        canvas.before:
+            Color:
+                rgba: 0.95, 0.95, 0.95, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: '[b]INVENTARIO[/b]'
+            markup: True
+            font_size: dp(24)
+            color: 0.1, 0.4, 0.8, 1
+            size_hint_y: None
+            height: dp(40)
+
+        ScrollView:
+            bar_width: dp(10)
+            bar_color: 0.1, 0.4, 0.8, 1
+            do_scroll_x: False
+
+            RecycleView:
+                id: lista_productos
+                viewclass: 'ItemInventarioCustom'
+
+                RecycleBoxLayout:
+                    default_size: None, None
+                    default_size_hint: 1, None
+                    size_hint_y: None
+                    height: self.minimum_height
+                    orientation: 'vertical'
+                    spacing: dp(8)
+                    padding: dp(8)
+
+        Button:
+            text: 'Volver'
+            background_color: 0.2, 0.2, 0.2, 1
+            color: 1, 1, 1, 1
+            font_size: dp(18)
+            size_hint_y: None
+            height: dp(50)
+            on_press: root.manager.current = 'productos_menu'
+
+<ItemInventarioCustom>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    padding: dp(8)
+    spacing: dp(4)
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Label:
+        text: root.texto_inventario
+        markup: True
+        halign: 'left'
+        valign: 'middle'
+        color: 0, 0, 0, 1
+        text_size: self.width, None
+        size_hint_y: None
+        height: self.texture_size[1] + dp(4)

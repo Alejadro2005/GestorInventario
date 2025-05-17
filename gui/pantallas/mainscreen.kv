@@ -1,0 +1,69 @@
+<MainScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(15)
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: '[b]MENÚ PRINCIPAL[/b]'
+            markup: True
+            font_size: dp(32)
+            color: 0.1, 0.4, 0.8, 1
+            size_hint_y: None
+            height: dp(40)
+
+        GridLayout:
+            cols: 1
+            spacing: dp(10)
+            size_hint_y: 0.8
+
+            Button:
+                text: '1. Gestión de Productos'
+                background_color: 0.1, 0.4, 0.8, 1
+                size_hint_y: None
+                height: dp(50)
+                on_press:
+                    app.root.get_screen('login').destino = 'productos_menu'
+                    root.manager.current = 'login'
+                    root.manager.transition.direction = 'left'
+
+            Button:
+                text: '2. Gestión de Usuarios'
+                background_color: 0.1, 0.4, 0.8, 1
+                size_hint_y: None
+                height: dp(50)
+                on_press:
+                    app.root.get_screen('login').destino = 'usuarios_menu'
+                    root.manager.current = 'login'
+                    root.manager.transition.direction = 'left'
+
+            Button:
+                text: '3. Registrar Venta'
+                background_color: 0.1, 0.4, 0.8, 1
+                size_hint_y: None
+                height: dp(50)
+                on_press:
+                    root.manager.current = 'ventas'
+                    root.manager.transition.direction = 'left'
+
+            Button:
+                text: '4. Historial de Ventas'
+                background_color: 0.1, 0.4, 0.8, 1
+                size_hint_y: None
+                height: dp(50)
+                on_press:
+                    root.manager.current = 'historial'
+                    root.manager.transition.direction = 'left'
+
+        Button:
+            text: '5. Salir'
+            background_color: 0.8, 0.1, 0.1, 1
+            size_hint_y: None
+            height: dp(50)
+            on_press: app.stop() 

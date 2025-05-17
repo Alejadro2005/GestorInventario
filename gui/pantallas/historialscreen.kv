@@ -1,0 +1,95 @@
+#:import dp kivy.metrics.dp
+
+<HistorialScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(15)
+        canvas.before:
+            Color:
+                rgba: 0.95, 0.95, 0.95, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: '[b]HISTORIAL DE VENTAS[/b]'
+            markup: True
+            font_size: dp(24)
+            color: 0.1, 0.4, 0.8, 1  # Azul
+            size_hint_y: None
+            height: dp(40)
+
+        ScrollView:
+            bar_width: dp(10)
+            bar_color: 0.1, 0.4, 0.8, 1
+            do_scroll_x: False
+
+            RecycleView:
+                id: lista_ventas
+                viewclass: 'HistorialVentaItemCustom'
+
+                RecycleBoxLayout:
+                    default_size: None, dp(120)  # Aumentado para dar más espacio
+                    default_size_hint: 1, None
+                    size_hint_y: None
+                    height: self.minimum_height
+                    orientation: 'vertical'
+                    spacing: dp(10)
+                    padding: dp(10)
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            spacing: dp(10)
+
+            Button:
+                text: 'Borrar Historial'
+                background_color: 1, 0.2, 0.2, 1
+                color: 1, 1, 1, 1
+                font_size: dp(18)
+                on_press: root.borrar_historial()
+
+            Button:
+                text: 'Volver'
+                background_color: 0.2, 0.2, 0.2, 1
+                color: 1, 1, 1, 1
+                font_size: dp(18)
+                on_press: root.manager.current = 'main'
+
+<HistorialVentaItemCustom>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height + dp(40)
+    padding: dp(24), dp(20)
+    spacing: dp(10)
+    canvas.before:
+        Color:
+            rgba: 0.98, 0.98, 0.98, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    canvas.after:
+        Color:
+            rgba: 0.8, 0.8, 0.8, 1
+        Rectangle:
+            pos: self.x, self.y
+            size: self.width, dp(2)
+
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height
+        spacing: dp(8)
+
+        Label:
+            text: root.texto_venta
+            markup: True
+            color: 0.1, 0.1, 0.1, 1
+            halign: 'left'
+            valign: 'top'
+            text_size: self.width - dp(30), None
+            size_hint_y: None
+            height: self.texture_size[1] + dp(10)
+            font_size: dp(18)
+            padding: dp(10), dp(5)

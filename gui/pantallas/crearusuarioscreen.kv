@@ -1,0 +1,59 @@
+<CrearUsuarioScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 20
+        spacing: 15
+        canvas.before:
+            Color:
+                rgba: 0.95, 0.95, 0.95, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        ScrollView:
+            GridLayout:
+                cols: 2
+                spacing: 10
+                size_hint_y: None
+                height: self.minimum_height
+                row_default_height: '40dp'
+
+                Label:
+                    text: '[b]Nombre:[/b]'
+                    markup: True
+                    color: 0.2, 0.2, 0.2, 1
+                TextInput:
+                    id: nombre_usuario
+                    hint_text: "Ej: Juan Pérez"
+
+                Label:
+                    text: '[b]Rol:[/b]'
+                    markup: True
+                    color: 0.2, 0.2, 0.2, 1
+                TextInput:
+                    id: rol_usuario
+                    hint_text: "admin/empleado"
+
+                Label:
+                    text: '[b]Contraseña:[/b]'
+                    markup: True
+                    color: 0.2, 0.2, 0.2, 1
+                TextInput:
+                    id: password_usuario
+                    password: True
+                    hint_text: "Mínimo 6 caracteres"
+
+        BoxLayout:
+            size_hint_y: None
+            height: '50dp'
+            spacing: 10
+
+            Button:
+                text: 'GUARDAR'
+                background_color: 0.1, 0.8, 0.4, 1
+                on_press: root.crear_usuario()
+
+            Button:
+                text: 'CANCELAR'
+                background_color: 0.8, 0.1, 0.1, 1
+                on_press: root.manager.current = 'usuarios_menu'

@@ -1,0 +1,192 @@
+#:import datetime datetime
+#:import dp kivy.metrics.dp
+
+<VentasScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(15)
+        canvas.before:
+            Color:
+                rgba: 0.95, 0.95, 0.95, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: '[b]REGISTRAR VENTA[/b]'
+            markup: True
+            font_size: dp(24)
+            color: 0.1, 0.4, 0.8, 1
+            size_hint_y: None
+            height: dp(40)
+
+        GridLayout:
+            cols: 2
+            spacing: dp(15)
+            size_hint_y: 0.6
+
+            # Productos disponibles
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: dp(5)
+                Label:
+                    text: '[b]PRODUCTOS DISPONIBLES[/b]'
+                    markup: True
+                    color: 0.2, 0.2, 0.2, 1
+                    size_hint_y: None
+                    height: dp(30)
+                ScrollView:
+                    bar_width: dp(10)
+                    bar_color: 0.1, 0.4, 0.8, 1
+                    RecycleView:
+                        id: lista_productos
+                        viewclass: 'ProductoSeleccionableBtn'
+                        RecycleBoxLayout:
+                            default_size: None, dp(40)
+                            default_size_hint: 1, None
+                            size_hint_y: None
+                            height: self.minimum_height
+                            orientation: 'vertical'
+                            spacing: dp(5)
+
+            # Productos seleccionados
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: dp(5)
+                Label:
+                    text: '[b]PRODUCTOS SELECCIONADOS[/b]' if root.productos_seleccionados else '[b]SIN PRODUCTOS[/b]'
+                    markup: True
+                    color: 0.2, 0.2, 0.2, 1
+                    size_hint_y: None
+                    height: dp(30)
+                ScrollView:
+                    bar_width: dp(10)
+                    bar_color: 0.1, 0.4, 0.8, 1
+                    RecycleView:
+                        id: productos_seleccionados
+                        viewclass: 'ProductoLabel'
+                        RecycleBoxLayout:
+                            default_size: None, dp(40)
+                            default_size_hint: 1, None
+                            size_hint_y: None
+                            height: self.minimum_height
+                            orientation: 'vertical'
+                            spacing: dp(5)
+
+        GridLayout:
+            cols: 2
+            spacing: dp(10)
+            row_default_height: dp(40)
+            size_hint_y: None
+            height: dp(160)
+
+            Label:
+                text: '[b]FECHA (DD/MM/AAAA):[/b]'
+                markup: True
+                color: 0.2, 0.2, 0.2, 1
+            TextInput:
+                id: fecha_venta
+                hint_text: "Ej: 25/04/2024"
+                text: datetime.datetime.now().strftime("%d/%m/%Y")
+                background_color: 0.95, 0.95, 0.95, 1
+                disabled: True
+                multiline: False
+
+            Label:
+                text: '[b]ID EMPLEADO:[/b]'
+                markup: True
+                color: 0.2, 0.2, 0.2, 1
+            TextInput:
+                id: id_empleado
+                hint_text: "Ej: 2001"
+                input_filter: 'int'
+                background_color: 1, 1, 1, 1
+                multiline: False
+                input_type: 'number'
+                on_text: if self.text and int(self.text or 0) <= 0: self.text = ""
+
+            Label:
+                text: '[b]ID PRODUCTO:[/b]'
+                markup: True
+                color: 0.2, 0.2, 0.2, 1
+            TextInput:
+                id: id_producto
+                hint_text: "Ej: 1001"
+                input_filter: 'int'
+                background_color: 1, 1, 1, 1
+                multiline: False
+                input_type: 'number'
+                on_text: if self.text and int(self.text or 0) <= 0: self.text = ""
+
+            Label:
+                text: '[b]CANTIDAD:[/b]'
+                markup: True
+                color: 0.2, 0.2, 0.2, 1
+            TextInput:
+                id: cantidad
+                hint_text: "Ej: 2"
+                input_filter: 'int'
+                background_color: 1, 1, 1, 1
+                multiline: False
+                input_type: 'number'
+                on_text: if self.text and int(self.text or 0) <= 0: self.text = ""
+
+        Label:
+            id: resumen_venta
+            text: ''
+            size_hint_y: None
+            height: dp(40)
+            color: 0.2, 0.2, 0.2, 1
+            text_size: self.width, None
+            halign: 'left'
+            valign: 'middle'
+            padding: dp(10), dp(5)
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            spacing: dp(10)
+            padding: [0, dp(5), 0, 0]
+
+            Button:
+                text: 'AGREGAR PRODUCTO'
+                background_color: 0.1, 0.8, 0.4, 1
+                on_press: root.agregar_producto_venta()
+
+            Button:
+                text: 'PROCESAR VENTA'
+                background_color: 0.1, 0.4, 0.8, 1
+                on_press: root.procesar_venta()
+
+            Button:
+                text: 'CANCELAR'
+                background_color: 0.8, 0.1, 0.1, 1
+                on_press:
+                    root.resetear_campos()
+                    root.manager.current = 'main'
+
+<ProductoLabel@Label>:
+    font_size: dp(14)
+    text_size: self.width, None
+    halign: 'left'
+    valign: 'middle'
+    padding: dp(10), dp(5)
+    color: (0.6, 0.6, 0.6, 1) if '[Agotado]' in self.text else (0.1, 0.1, 0.1, 1)
+    canvas.before:
+        Color:
+            rgba: 0.95, 0.95, 0.95, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<ProductoSeleccionableBtn@Button>:
+    texto_producto: ''
+    id_producto: 0
+    text: root.texto_producto
+    size_hint_y: None
+    height: dp(40)
+    background_color: 0.95, 0.95, 0.95, 1
+    color: 0.1, 0.1, 0.1, 1
+    font_size: dp(14)
+    on_press: app.root.get_screen('ventas').seleccionar_producto(root.id_producto)
