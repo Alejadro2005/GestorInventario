@@ -11,7 +11,6 @@ from src.database.database_interface import DatabaseInterface
 import logging
 from typing import List
 
-RUTA_INVENTARIO = "data/inventario.json"
 logger = logging.getLogger(__name__)
 
 

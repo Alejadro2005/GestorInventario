@@ -3,7 +3,6 @@ from src.modelos.producto import Producto
 from src.modelos.usuario import Usuario
 from src.modulos.gestor_usuarios import GestorUsuarios
 from src.modulos.tienda import Tienda
-from src.modulos.persistencia import PersistenciaJSON
 from src.errores.usuario_no_encontrado import UsuarioNoEncontradoError
 from src.modelos.venta import Venta
 from src.errores import *
@@ -17,23 +16,6 @@ class ConsoleUI:
         self.gestor = gestor_usuarios
         self.inventario = inventario
         self.tienda = Tienda(self.inventario.db, self.inventario)
-
-    def _cargar_inventario(self, ruta: str = "data/inventario.json") -> Inventario:
-        datos = PersistenciaJSON.cargar_datos(ruta)
-
-        # Manejar nuevo formato (diccionario) y antiguo (lista)
-        if isinstance(datos, dict):
-            productos_data = datos.values()  # Obtener solo los valores (datos del producto)
-        else:
-            productos_data = datos  # Compatibilidad con formato antiguo
-
-        productos = [Producto.from_dict(p) for p in productos_data] if productos_data else []
-        return Inventario(productos)
-
-    def _guardar_inventario(self):
-        # Guardar como diccionario con ID como clave
-        datos = {str(p.id): p.to_dict() for p in self.inventario.productos}
-        PersistenciaJSON.guardar_datos("data/inventario.json", datos)
 
     def _limpiar_pantalla(self):
         os.system('cls' if os.name == 'nt' else 'clear')
