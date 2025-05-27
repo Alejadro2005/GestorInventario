@@ -19,7 +19,7 @@ Incluye control de inventario, registro de ventas, gestión de usuarios con role
 - **gui/**: Interfaz gráfica de usuario (pantallas Kivy, layouts .kv)
 - **cli/**: Menú por consola
 - **tests/**: Casos de prueba automatizados (pytest)
-- **modelo_relacional.puml**: Diagrama entidad-relación (notación Barker/PlantUML)
+- **modelo_relacional.puml**: Diagrama entidad-relación
 - **database.sql**: Script DDL para crear las tablas
 
 ---
