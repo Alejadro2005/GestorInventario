@@ -227,15 +227,6 @@ El modelo relacional se representa en notación Barker (PlantUML) y está sincro
 
 ---
 
-## 🤝 Cómo contribuir
-
-¿Te gustaría mejorar este proyecto? ¡Las contribuciones son bienvenidas!
-1. Haz un fork del repositorio
-2. Crea una rama para tu funcionalidad o corrección
-3. Haz tus cambios y abre un Pull Request
-
----
-
 ## 📊 Diagramas del Sistema
 
 - **Diagrama de Clases:**
