@@ -215,7 +215,7 @@ pytest --cov=src --cov-report=html
 
 El modelo relacional está alineado con el script DDL (`database.sql` o `tienda_ddl_inserts.txt`) y representado en notación Barker (PlantUML):
 
-![Diagrama ER](modelo_relacional.png)
+![DDL.png](Img/DDL.png)
 
 > El archivo fuente editable está en `modelo_relacional.puml`.
 
