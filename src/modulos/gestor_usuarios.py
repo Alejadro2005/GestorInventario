@@ -1,10 +1,10 @@
-from src.modelos.usuario import Usuario
-from src.errores.usuario_no_encontrado import UsuarioNoEncontradoError
-from src.errores.usuario_duplicado import UsuarioDuplicadoError
-from src.database.database_interface import DatabaseInterface
+from modelos.usuario import Usuario
+from errores.usuario_no_encontrado import UsuarioNoEncontradoError
+from errores.usuario_duplicado import UsuarioDuplicadoError
+from database.database_interface import DatabaseInterface
 import logging
 from typing import List
-from src.errores.contrasena_invalida import ContrasenaInvalidaError
+from errores.contrasena_invalida import ContrasenaInvalidaError
 
 logger = logging.getLogger(__name__)
 

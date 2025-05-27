@@ -4,7 +4,7 @@ import sys
 # Agregar el directorio src al PYTHONPATH
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from gui.app import TiendaApp
+from web.app import app
 from database.postgres_database import PostgresDatabase
 from database.database_config import CURRENT_CONFIG
 
@@ -19,8 +19,7 @@ if __name__ == '__main__':
     # Inicializar base de datos
     db = inicializar_base_datos()
     
-    # Iniciar la aplicación
-    app = TiendaApp(db)
-    app.run()
+    # Iniciar la aplicación web
+    app.run(debug=True)
 
-#python gui_main.py ejecutar este comando directamente en consola
+#python web_main.py ejecutar este comando directamente en consola 

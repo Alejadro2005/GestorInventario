@@ -1,9 +1,11 @@
 import psycopg2
 from psycopg2 import Error
-from .database_interface import DatabaseInterface
-from ..errores.database_error import DatabaseError
+from database.database_interface import DatabaseInterface
+from errores.database_error import DatabaseError
 import os
 from dotenv import load_dotenv
+import datetime
+from psycopg2.extras import RealDictCursor
 
 class PostgresDatabase(DatabaseInterface):
     """
@@ -26,6 +28,7 @@ class PostgresDatabase(DatabaseInterface):
         """
         self.config = config
         self.connection = None
+        self.cursor = None
         load_dotenv()
         
     def connect(self):
@@ -43,6 +46,7 @@ class PostgresDatabase(DatabaseInterface):
                 password=os.getenv('DB_PASSWORD', 'postgres'),
                 port=os.getenv('DB_PORT', '5432')
             )
+            self.cursor = self.connection.cursor(cursor_factory=RealDictCursor)
         except Error as e:
             raise DatabaseError(f"Error al conectar a PostgreSQL: {str(e)}")
 
@@ -421,14 +425,11 @@ class PostgresDatabase(DatabaseInterface):
     def insert_sale(self, sale_data):
         """
         Inserta una nueva venta en la base de datos.
-        
-        Args:
-            sale_data (dict): Datos de la venta a insertar
-            
-        Returns:
-            int: ID de la venta insertada
         """
         try:
+            # Si no se recibe 'fecha', usar la fecha y hora actual
+            if 'fecha' not in sale_data:
+                sale_data['fecha'] = datetime.datetime.now()
             # Si el ID está en los datos, usarlo directamente
             if 'id' in sale_data:
                 id_venta = sale_data.pop('id')
@@ -655,4 +656,41 @@ class PostgresDatabase(DatabaseInterface):
             cursor.close()
             return next_id
         except Error as e:
-            raise DatabaseError(f"Error al obtener siguiente ID de venta: {str(e)}") 
+            raise DatabaseError(f"Error al obtener siguiente ID de venta: {str(e)}")
+
+    def delete_sale(self, sale_id):
+        """
+        Elimina una venta y sus detalles de la base de datos.
+        """
+        try:
+            cursor = self.connection.cursor()
+            # Eliminar detalles de la venta
+            cursor.execute("DELETE FROM detalle_ventas WHERE venta_id = %s", (sale_id,))
+            # Eliminar la venta
+            cursor.execute("DELETE FROM ventas WHERE id = %s", (sale_id,))
+            self.connection.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.connection.rollback()
+            raise DatabaseError(f"Error al eliminar venta: {e}")
+
+    def tables_exist(self):
+        """
+        Verifica si las tablas necesarias ya existen en la base de datos.
+        :return: True si las tablas existen, False en caso contrario.
+        """
+        # Aquí puedes usar una consulta SQL para verificar si las tablas existen
+        # Por ejemplo, puedes usar una consulta como:
+        # SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'nombre_de_la_tabla');
+        # Retorna True si las tablas existen, False en caso contrario.
+        pass
+
+    def close(self):
+        """
+        Cierra la conexión a la base de datos.
+        """
+        if self.cursor:
+            self.cursor.close()
+        if self.connection:
+            self.connection.close() 

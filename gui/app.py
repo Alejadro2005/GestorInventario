@@ -4,16 +4,16 @@ from gui.pantallas.productos import ProductosMenuScreen, AgregarProductoScreen, 
 from gui.pantallas.usuarios import UsuariosMenuScreen, CrearUsuarioScreen, EliminarUsuarioScreen, ListarUsuariosScreen
 from gui.pantallas.ventas import VentasScreen
 from gui.pantallas.historial import HistorialScreen
-from src.modulos.console_ui import ConsoleUI
+from modulos.console_ui import ConsoleUI
 from kivy.lang import Builder
 from kivy.core.window import Window
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager
-from src.database.postgres_database import PostgresDatabase
-from src.modelos.inventario import Inventario
-from src.modulos.gestor_usuarios import GestorUsuarios
+from database.postgres_database import PostgresDatabase
+from modelos.inventario import Inventario
+from modulos.gestor_usuarios import GestorUsuarios
 import os
-from src.utils.logger import logger
+from utils.logger import logger
 
 # Obtener la ruta base del proyecto
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

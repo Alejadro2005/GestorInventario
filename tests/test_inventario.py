@@ -1,15 +1,15 @@
 import pytest
-from src.modelos.producto import Producto
-from src.modelos.inventario import Inventario
-from src.errores.productos_duplicados import ProductoDuplicadoError
-from src.errores.producto_no_encontrado import ProductoNoEncontradoError
-from src.errores.producto_invalido import ProductoInvalidoError
-from src.errores.stock_invalido import StockInvalidoError
-from src.errores.no_hay_productos import NoHayProductosError
-from src.errores.categoria_invalida import CategoriaInvalidaError
-from src.errores.precio_invalido import PrecioInvalidoError
-from src.errores.stock_insuficiente import StockInsuficienteError
-from src.database.test_database import DatabaseTest
+from modelos.producto import Producto
+from modelos.inventario import Inventario
+from errores.productos_duplicados import ProductoDuplicadoError
+from errores.producto_no_encontrado import ProductoNoEncontradoError
+from errores.producto_invalido import ProductoInvalidoError
+from errores.stock_invalido import StockInvalidoError
+from errores.no_hay_productos import NoHayProductosError
+from errores.categoria_invalida import CategoriaInvalidaError
+from errores.precio_invalido import PrecioInvalidoError
+from errores.stock_insuficiente import StockInsuficienteError
+from database.test_database import DatabaseTest
 
 @pytest.fixture
 def inventario():
@@ -94,10 +94,12 @@ def test_agregar_producto_duplicado(inventario_limpio):
     """
     Test para verificar que se lance una excepción al intentar agregar un producto con nombre duplicado.
     """
+    from errores.productos_duplicados import ProductoDuplicadoError as ProductoDuplicadoError1
+    from src.errores.productos_duplicados import ProductoDuplicadoError as ProductoDuplicadoError2
     producto1 = Producto(1, "lapiz", 500, 10, "escolar", 1)
     producto2 = Producto(2, "lapiz", 1500, 20, "escolar", 1)  # mismo nombre
     inventario_limpio.agregar_producto(producto1)
-    with pytest.raises(ProductoDuplicadoError):
+    with pytest.raises((ProductoDuplicadoError1, ProductoDuplicadoError2)):
         inventario_limpio.agregar_producto(producto2)
 
 

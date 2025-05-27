@@ -1,14 +1,14 @@
-from src.modelos.inventario import Inventario
-from src.modelos.producto import Producto
-from src.modelos.usuario import Usuario
-from src.modulos.gestor_usuarios import GestorUsuarios
-from src.modulos.tienda import Tienda
-from src.errores.usuario_no_encontrado import UsuarioNoEncontradoError
-from src.modelos.venta import Venta
-from src.errores import *
+from modelos.inventario import Inventario
+from modelos.producto import Producto
+from modelos.usuario import Usuario
+from modulos.gestor_usuarios import GestorUsuarios
+from modulos.tienda import Tienda
+from errores.usuario_no_encontrado import UsuarioNoEncontradoError
+from modelos.venta import Venta
+from errores import *
 from datetime import datetime
 import os
-from src.database.database_interface import DatabaseInterface
+from database.database_interface import DatabaseInterface
 
 
 class ConsoleUI:

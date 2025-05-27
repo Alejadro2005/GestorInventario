@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Usuarios - Gestor de Inventario{% endblock %}
+
+{% block content %}
+<h2>Listado de Usuarios</h2>
+<a href="{{ url_for('usuarios.crear') }}" class="btn btn-primary mb-3">Crear Usuario</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+            <td>{{ usuario.id }}</td>
+            <td>{{ usuario.nombre }}</td>
+            <td>{{ usuario.rol }}</td>
+            <td>
+                <a href="{{ url_for('usuarios.actualizar', id=usuario.id) }}" class="btn btn-sm btn-warning">Editar</a>
+                <form action="{{ url_for('usuarios.eliminar', id=usuario.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %} 

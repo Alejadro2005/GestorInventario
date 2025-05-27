@@ -1,9 +1,9 @@
 from datetime import datetime
-from src.errores.nombre_usuario_invalido import NombreUsuarioInvalidoError
-from src.errores.rol_invalido import RolInvalidoError
-from src.errores.contrasena_invalida import ContrasenaInvalidaError
-from src.errores.credenciales_invalidas import CredencialesInvalidasError
-from src.errores.contrasena_expirada import ContrasenaExpiradaError
+from errores.nombre_usuario_invalido import NombreUsuarioInvalidoError
+from errores.rol_invalido import RolInvalidoError
+from errores.contrasena_invalida import ContrasenaInvalidaError
+from errores.credenciales_invalidas import CredencialesInvalidasError
+from errores.contrasena_expirada import ContrasenaExpiradaError
 
 class Usuario:
     """

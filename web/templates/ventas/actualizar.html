@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Actualizar Venta - Gestor de Inventario{% endblock %}
+
+{% block content %}
+<h2>Actualizar Venta</h2>
+<form method="POST" action="{{ url_for('ventas.actualizar', id=venta.id) }}" id="ventaForm">
+    <div class="form-group">
+        <label for="id_usuario">ID de Usuario</label>
+        <input type="number" class="form-control" id="id_usuario" name="id_usuario" value="{{ venta.id_usuario }}" required>
+    </div>
+    <div class="form-group">
+        <label for="productos">Productos</label>
+        <select multiple class="form-control" id="productos" name="productos" required>
+            {% for producto in productos %}
+            <option value="{{ producto.id }}" data-stock="{{ producto.cantidad }}" {% if detalles and producto.id in detalles %}selected{% endif %} {% if producto.cantidad == 0 %}style="color: red; text-decoration: underline;" disabled{% endif %}>
+                {{ producto.nombre }} ({{ producto.cantidad }} disponibles){% if producto.cantidad == 0 %} - AGOTADO{% endif %}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div id="cantidadesContainer"></div>
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a href="{{ url_for('ventas.index') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+const productosSelect = document.getElementById('productos');
+const cantidadesContainer = document.getElementById('cantidadesContainer');
+const detallesData = {{ detalles|tojson }};
+
+function renderCantidades() {
+    cantidadesContainer.innerHTML = '';
+    Array.from(productosSelect.selectedOptions).forEach(option => {
+        const stock = option.getAttribute('data-stock');
+        const label = document.createElement('label');
+        label.textContent = `Cantidad para ${option.textContent}`;
+        label.setAttribute('for', `cantidad_${option.value}`);
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.className = 'form-control mb-2';
+        input.name = 'cantidad_' + option.value;
+        input.id = 'cantidad_' + option.value;
+        input.min = 1;
+        input.max = stock;
+        input.required = true;
+        if (detallesData[option.value]) {
+            input.value = detallesData[option.value];
+        }
+        cantidadesContainer.appendChild(label);
+        cantidadesContainer.appendChild(input);
+    });
+}
+
+productosSelect.addEventListener('change', renderCantidades);
+window.addEventListener('DOMContentLoaded', renderCantidades);
+</script>
+{% endblock %} 

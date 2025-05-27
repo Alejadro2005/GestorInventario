@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Ventas - Gestor de Inventario{% endblock %}
+
+{% block content %}
+<h2>Listado de Ventas</h2>
+<a href="{{ url_for('ventas.crear') }}" class="btn btn-primary mb-3">Crear Venta</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>ID Usuario</th>
+            <th>Productos</th>
+            <th>Total</th>
+            <th>Método de Pago</th>
+            <th>Fecha y Hora</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for venta in ventas %}
+        <tr>
+            <td>{{ venta.id }}</td>
+            <td>{{ venta.id_usuario }}</td>
+            <td>{{ venta.productos_legibles }}</td>
+            <td>${{ '%.2f'|format(venta.total) }}</td>
+            <td>{{ venta.metodo_pago if venta.metodo_pago else 'No disponible' }}</td>
+            <td>{{ venta.fecha_hora.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td>
+                <form action="{{ url_for('ventas.eliminar', id=venta.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">Eliminar</button>
+                </form>
+                <form action="{{ url_for('ventas.deshacer', id=venta.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-secondary" onclick="return confirm('¿Seguro que deseas deshacer esta venta?')">Deshacer</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %} 

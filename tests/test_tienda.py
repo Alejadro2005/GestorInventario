@@ -1,21 +1,22 @@
 import pytest
-from src.modelos.venta import Venta
-from src.modulos.tienda import Tienda
-from src.modelos.inventario import Inventario
-from src.modelos.producto import Producto
-from src.errores.producto_invalido import ProductoInvalidoError
-from src.errores.fecha_invalida import FechaInvalidaError
-from src.errores.productos_duplicados import ProductoDuplicadoError
-from src.errores.stock_insuficiente import StockInsuficienteError
-from src.errores.venta_invalida import VentaInvalidaError
-from src.errores.venta_producto_no_registrado import VentaProductoNoRegistradoError
-from src.errores.descuento_invalido import DescuentoInvalidoError
-from src.errores.total_invalido import TotalInvalidoError
-from src.errores.venta_sin_empleado import VentaSinEmpleadoError
-from src.errores.categoria_invalida import CategoriaInvalidaError
-from src.errores.precio_invalido import PrecioInvalidoError
-from src.errores.stock_invalido import StockInvalidoError
-from src.database.test_database import DatabaseTest
+from modelos.venta import Venta
+from modulos.tienda import Tienda
+from modelos.inventario import Inventario
+from modelos.producto import Producto
+from errores.producto_invalido import ProductoInvalidoError
+from errores.fecha_invalida import FechaInvalidaError
+from errores.productos_duplicados import ProductoDuplicadoError as ProductoDuplicadoError1
+from src.errores.productos_duplicados import ProductoDuplicadoError as ProductoDuplicadoError2
+from errores.stock_insuficiente import StockInsuficienteError
+from errores.venta_invalida import VentaInvalidaError
+from errores.venta_producto_no_registrado import VentaProductoNoRegistradoError
+from errores.descuento_invalido import DescuentoInvalidoError
+from errores.total_invalido import TotalInvalidoError
+from errores.venta_sin_empleado import VentaSinEmpleadoError
+from errores.categoria_invalida import CategoriaInvalidaError
+from errores.precio_invalido import PrecioInvalidoError
+from errores.stock_invalido import StockInvalidoError
+from database.test_database import DatabaseTest
 
 @pytest.fixture
 def db():
@@ -170,7 +171,7 @@ def test_producto_duplicado(inventario_limpio):
     producto1 = Producto(1, "lapiz", 500, 10, "escolar", 1)
     producto2 = Producto(1, "lapiz", 500, 10, "escolar", 1)
     inventario_limpio.agregar_producto(producto1)
-    with pytest.raises(ProductoDuplicadoError):
+    with pytest.raises((ProductoDuplicadoError1, ProductoDuplicadoError2)):
         inventario_limpio.agregar_producto(producto2)
 
 def test_stock_insuficiente(inventario_limpio):

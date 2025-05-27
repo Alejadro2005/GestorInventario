@@ -1,7 +1,7 @@
-from src.modelos.inventario import Inventario
-from src.modelos.venta import Venta
-from src.errores.stock_insuficiente import StockInsuficienteError
-from src.errores.venta_producto_no_registrado import VentaProductoNoRegistradoError
+from modelos.inventario import Inventario
+from modelos.venta import Venta
+from errores.stock_insuficiente import StockInsuficienteError
+from errores.venta_producto_no_registrado import VentaProductoNoRegistradoError
 from typing import List, Dict
 import logging
 

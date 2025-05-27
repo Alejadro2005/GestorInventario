@@ -1,7 +1,7 @@
-from src.errores.producto_invalido import ProductoInvalidoError
-from src.errores.stock_invalido import StockInvalidoError
-from src.errores.precio_invalido import PrecioInvalidoError
-from src.errores.categoria_invalida import CategoriaInvalidaError
+from errores.producto_invalido import ProductoInvalidoError
+from errores.stock_invalido import StockInvalidoError
+from errores.precio_invalido import PrecioInvalidoError
+from errores.categoria_invalida import CategoriaInvalidaError
 
 
 class Producto:

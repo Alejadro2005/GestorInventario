@@ -1,13 +1,13 @@
 import os
 import json
-from src.modelos.producto import Producto
-from src.errores.producto_invalido import ProductoInvalidoError
-from src.errores.producto_no_encontrado import ProductoNoEncontradoError
-from src.errores.productos_duplicados import ProductoDuplicadoError
-from src.errores.stock_invalido import StockInvalidoError
-from src.errores.no_hay_productos import NoHayProductosError
-from src.errores.stock_insuficiente import StockInsuficienteError
-from src.database.database_interface import DatabaseInterface
+from modelos.producto import Producto
+from errores.producto_invalido import ProductoInvalidoError
+from errores.producto_no_encontrado import ProductoNoEncontradoError
+from errores.productos_duplicados import ProductoDuplicadoError
+from errores.stock_invalido import StockInvalidoError
+from errores.no_hay_productos import NoHayProductosError
+from errores.stock_insuficiente import StockInsuficienteError
+from database.database_interface import DatabaseInterface
 import logging
 from typing import List
 

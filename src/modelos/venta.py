@@ -1,14 +1,14 @@
 from datetime import datetime
-from src.errores.categoria_invalida import CategoriaInvalidaError
-from src.errores.fecha_invalida import FechaInvalidaError
-from src.errores.venta_producto_no_registrado import VentaProductoNoRegistradoError
-from src.errores.venta_invalida import VentaInvalidaError
-from src.errores.venta_sin_empleado import VentaSinEmpleadoError
-from src.errores.total_invalido import TotalInvalidoError
-from src.errores.descuento_invalido import DescuentoInvalidoError
-from src.errores.stock_insuficiente import StockInsuficienteError
+from errores.categoria_invalida import CategoriaInvalidaError
+from errores.fecha_invalida import FechaInvalidaError
+from errores.venta_producto_no_registrado import VentaProductoNoRegistradoError
+from errores.venta_invalida import VentaInvalidaError
+from errores.venta_sin_empleado import VentaSinEmpleadoError
+from errores.total_invalido import TotalInvalidoError
+from errores.descuento_invalido import DescuentoInvalidoError
+from errores.stock_insuficiente import StockInsuficienteError
 from typing import List, Tuple, Dict
-from src.modelos.inventario import Inventario
+from modelos.inventario import Inventario
 
 CATEGORIAS_VALIDAS = ["electronica", "escolar"]
 

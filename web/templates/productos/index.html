@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Productos - Gestor de Inventario{% endblock %}
+
+{% block content %}
+<h2>Listado de Productos</h2>
+<a href="{{ url_for('productos.crear') }}" class="btn btn-primary mb-3">Crear Producto</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Categoría</th>
+            <th>Stock Mínimo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for producto in productos %}
+        <tr>
+            <td>{{ producto.id }}</td>
+            <td>{{ producto.nombre }}</td>
+            <td>{{ producto.precio }}</td>
+            <td>{{ producto.cantidad }}</td>
+            <td>{{ producto.categoria }}</td>
+            <td>{{ producto.stock_minimo }}</td>
+            <td>
+                <a href="{{ url_for('productos.actualizar', id=producto.id) }}" class="btn btn-sm btn-warning">Editar</a>
+                <form action="{{ url_for('productos.eliminar', id=producto.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %} 

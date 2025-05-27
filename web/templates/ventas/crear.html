@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Venta - Gestor de Inventario{% endblock %}
+
+{% block content %}
+<h2>Crear Venta</h2>
+<form method="POST" action="{{ url_for('ventas.crear') }}" id="ventaForm">
+    <input type="hidden" name="metodo_pago" id="metodo_pago" value="">
+    <div class="form-group">
+        <label for="id_usuario">ID de Usuario</label>
+        <input type="number" class="form-control" id="id_usuario" name="id_usuario" required>
+    </div>
+    <div class="form-group">
+        <label>Buscar Producto</label>
+        <input type="text" class="form-control mb-3" id="buscadorProducto" placeholder="Buscar por nombre...">
+        <label>Productos</label>
+        <div class="row" id="listaProductos">
+            {% for producto in productos %}
+            <div class="col-md-4 mb-3 producto-item" data-nombre="{{ producto.nombre|lower }}">
+                <div class="card h-100 {% if producto.cantidad == 0 %}bg-light text-muted border-secondary{% else %}border-primary{% endif %}">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="checkbox" name="producto_{{ producto.id }}" id="producto_{{ producto.id }}" data-producto-id="{{ producto.id }}" data-precio="{{ producto.precio }}" class="mr-2" style="width: 1.5em; height: 1.5em;" {% if producto.cantidad == 0 %}disabled{% endif %}>
+                            <h5 class="card-title mb-0">{{ producto.nombre }}</h5>
+                        </div>
+                        <p class="card-text mb-1">
+                            <span class="badge badge-info">{{ producto.cantidad }} disponibles</span>
+                            {% if producto.cantidad == 0 %}<span class="badge badge-danger ml-2">AGOTADO</span>{% endif %}
+                        </p>
+                        <div class="input-group input-group-sm mt-2">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Cantidad</span>
+                            </div>
+                            <input type="number" class="form-control" name="cantidad_{{ producto.id }}" id="cantidad_{{ producto.id }}" min="1" max="{{ producto.cantidad }}" placeholder="0" style="max-width: 80px;" {% if producto.cantidad == 0 %}disabled{% endif %} disabled required>
+                        </div>
+                        <p class="card-text mt-2"><strong>Precio:</strong> ${{ '%.2f'|format(producto.precio) }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" id="btnMostrarMetodoPago">Crear</button>
+    <a href="{{ url_for('ventas.index') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+
+<!-- Modal Método de Pago -->
+<div class="modal fade" id="modalMetodoPago" tabindex="-1" role="dialog" aria-labelledby="modalMetodoPagoLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalMetodoPagoLabel">Seleccionar Método de Pago</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-center">
+        <button type="button" class="btn btn-success btn-lg mr-3" id="btnEfectivo">Efectivo</button>
+        <button type="button" class="btn btn-info btn-lg" id="btnTransferencia">Transferencia</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de venta (solo efectivo) -->
+<div class="modal fade" id="modalVenta" tabindex="-1" role="dialog" aria-labelledby="modalVentaLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalVentaLabel">Confirmar Venta</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Total de la venta:</strong> $<span id="totalVenta">0.00</span></p>
+        <div class="form-group">
+          <label for="montoCliente">Cantidad entregada por el cliente</label>
+          <input type="number" class="form-control" id="montoCliente" min="0" step="0.01">
+        </div>
+        <p><strong>Cambio a devolver:</strong> $<span id="cambioVenta">0.00</span></p>
+        <div id="alertaCambio" class="alert alert-danger d-none">El monto entregado es insuficiente.</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" id="btnTerminarVenta">Terminar venta</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Buscador de productos en tiempo real
+const buscador = document.getElementById('buscadorProducto');
+buscador.addEventListener('input', function() {
+    const filtro = buscador.value.toLowerCase();
+    document.querySelectorAll('.producto-item').forEach(function(item) {
+        const nombre = item.getAttribute('data-nombre');
+        if (nombre.includes(filtro)) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+
+document.querySelectorAll('input[type=checkbox][name^=producto_]').forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+        var prodId = this.getAttribute('data-producto-id');
+        var cantidadInput = document.getElementById('cantidad_' + prodId);
+        if (this.checked) {
+            cantidadInput.disabled = false;
+            cantidadInput.focus();
+        } else {
+            cantidadInput.disabled = true;
+            cantidadInput.value = '';
+        }
+    });
+});
+
+// Mostrar modal método de pago al hacer clic en Crear
+const btnMostrarMetodoPago = document.getElementById('btnMostrarMetodoPago');
+const modalMetodoPago = $('#modalMetodoPago');
+const modalVenta = $('#modalVenta');
+const totalVentaSpan = document.getElementById('totalVenta');
+const montoClienteInput = document.getElementById('montoCliente');
+const cambioVentaSpan = document.getElementById('cambioVenta');
+const alertaCambio = document.getElementById('alertaCambio');
+const btnTerminarVenta = document.getElementById('btnTerminarVenta');
+const ventaForm = document.getElementById('ventaForm');
+const btnEfectivo = document.getElementById('btnEfectivo');
+const btnTransferencia = document.getElementById('btnTransferencia');
+const metodoPagoInput = document.getElementById('metodo_pago');
+
+let totalVentaCalculado = 0;
+
+btnMostrarMetodoPago.addEventListener('click', function(e) {
+    e.preventDefault();
+    // Calcular el total
+    let total = 0;
+    let algunProducto = false;
+    document.querySelectorAll('input[type=checkbox][name^=producto_]').forEach(function(checkbox) {
+        if (checkbox.checked) {
+            algunProducto = true;
+            var prodId = checkbox.getAttribute('data-producto-id');
+            var cantidadInput = document.getElementById('cantidad_' + prodId);
+            var cantidad = parseInt(cantidadInput.value) || 0;
+            var precio = parseFloat(checkbox.getAttribute('data-precio')) || 0;
+            total += precio * cantidad;
+        }
+    });
+    if (!algunProducto) {
+        alert('Debes seleccionar al menos un producto y su cantidad.');
+        return;
+    }
+    totalVentaCalculado = total;
+    totalVentaSpan.textContent = total.toFixed(2);
+    montoClienteInput.value = '';
+    cambioVentaSpan.textContent = '0.00';
+    alertaCambio.classList.add('d-none');
+    modalMetodoPago.modal('show');
+});
+
+btnEfectivo.addEventListener('click', function() {
+    metodoPagoInput.value = 'efectivo';
+    modalMetodoPago.modal('hide');
+    setTimeout(() => { modalVenta.modal('show'); }, 300);
+});
+
+btnTransferencia.addEventListener('click', function() {
+    metodoPagoInput.value = 'transferencia';
+    modalMetodoPago.modal('hide');
+    ventaForm.submit();
+});
+
+// Calcular cambio en tiempo real
+montoClienteInput.addEventListener('input', function() {
+    const total = parseFloat(totalVentaSpan.textContent);
+    const entregado = parseFloat(montoClienteInput.value) || 0;
+    const cambio = entregado - total;
+    cambioVentaSpan.textContent = cambio.toFixed(2);
+    if (cambio < 0) {
+        alertaCambio.classList.remove('d-none');
+        btnTerminarVenta.disabled = true;
+    } else {
+        alertaCambio.classList.add('d-none');
+        btnTerminarVenta.disabled = false;
+    }
+});
+
+// Terminar venta
+btnTerminarVenta.addEventListener('click', function() {
+    // Solo enviar si el cambio es >= 0
+    const total = parseFloat(totalVentaSpan.textContent);
+    const entregado = parseFloat(montoClienteInput.value) || 0;
+    if (entregado < total) {
+        alertaCambio.classList.remove('d-none');
+        return;
+    }
+    modalVenta.modal('hide');
+    ventaForm.submit();
+});
+</script>
+{% endblock %} 

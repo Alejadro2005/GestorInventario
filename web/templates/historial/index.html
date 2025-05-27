@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Historial - Gestor de Inventario{% endblock %}
+
+{% block content %}
+<h2>Historial de Ventas</h2>
+<form action="{{ url_for('historial.eliminar') }}" method="POST" style="display:inline;">
+    <button type="submit" class="btn btn-danger mb-3" onclick="return confirm('¿Estás seguro de eliminar todo el historial?')">Eliminar Historial</button>
+</form>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>ID Usuario</th>
+            <th>Productos</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for venta in ventas %}
+        <tr>
+            <td>{{ venta.id }}</td>
+            <td>{{ venta.id_usuario }}</td>
+            <td>{{ venta.productos_legibles }}</td>
+            <td>${{ '%.2f'|format(venta.total) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %} 

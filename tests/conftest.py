@@ -1,6 +1,6 @@
 import pytest
-from src.database.test_database import DatabaseTest
-from src.modelos.inventario import Inventario
+from database.test_database import DatabaseTest
+from modelos.inventario import Inventario
 
 @pytest.fixture
 def inventario_limpio():

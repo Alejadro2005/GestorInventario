@@ -1,8 +1,8 @@
-from src.modelos.inventario import Inventario
-from src.modulos.gestor_usuarios import GestorUsuarios
-from src.modulos.tienda import Tienda
-from src.modelos.usuario import Usuario
-from src.utils.logger import logger
+from modelos.inventario import Inventario
+from modulos.gestor_usuarios import GestorUsuarios
+from modulos.tienda import Tienda
+from modelos.usuario import Usuario
+from utils.logger import logger
 
 class ConsoleUI:
     """

@@ -1,10 +1,10 @@
 import pytest
-from src.modelos.usuario import Usuario
-from src.errores.contrasena_invalida import ContrasenaInvalidaError
-from src.errores.credenciales_invalidas import CredencialesInvalidasError
-from src.errores.rol_invalido import RolInvalidoError
-from src.errores.nombre_usuario_invalido import NombreUsuarioInvalidoError
-from src.errores.contrasena_expirada import ContrasenaExpiradaError
+from modelos.usuario import Usuario
+from errores.contrasena_invalida import ContrasenaInvalidaError
+from errores.credenciales_invalidas import CredencialesInvalidasError
+from errores.rol_invalido import RolInvalidoError
+from errores.nombre_usuario_invalido import NombreUsuarioInvalidoError
+from errores.contrasena_expirada import ContrasenaExpiradaError
 
 def test_crear_usuario():
     usuario = Usuario(1, "admin", "admin", "admin123")

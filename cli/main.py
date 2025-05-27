@@ -1,7 +1,7 @@
-from src.database.postgres_database import PostgresDatabase
-from src.database.database_config import CURRENT_CONFIG
-from src.modelos.inventario import Inventario
-from src.modulos.gestor_usuarios import GestorUsuarios
+from database.postgres_database import PostgresDatabase
+from database.database_config import CURRENT_CONFIG
+from modelos.inventario import Inventario
+from modulos.gestor_usuarios import GestorUsuarios
 from cli.consoleui import ConsoleUI
 
 def inicializar_base_datos():
